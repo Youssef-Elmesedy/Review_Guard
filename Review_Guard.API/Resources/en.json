@@ -3,12 +3,33 @@
     "UserAlreadyExists": "A user with this email address already exists.",
     "InvalidCredentials": "Invalid email or password.",
     "EmailNotVerified": "Please verify your email first.",
-    "RegisterationFailed": "Registration failed."
+    "EmailAlreadyVerified": "Email is already verified.",
+    "RegisterationFailed": "Registration failed.",
+    "LoginFailed": "Login failed. Please try again.",
+    "LogoutSuccessfully": "Logout successful.",
+    "AdminLoginFailed": "Admin login failed. Please try again.",
+    "AccountInactive": "This account is inactive.",
+    "InvalidRefreshToken": "Invalid refresh token.",
+    "RefreshTokenExpired": "Refresh token has expired.",
+    "RefreshTokenFailed": "Token refresh failed.",
+    "LogoutFailed": "Logout failed.",
+    "InvalidVerificationToken": "Invalid verification token.",
+    "VerificationTokenExpired": "Verification token has expired.",
+    "EmailVerificationFailed": "Email verification failed.",
+    "PasswordResetFailed": "Password reset failed.",
+    "PasswordsDoNotMatch": "Passwords do not match.",
+    "ResetPasswordCodeSentSuccessfully": "A password reset code has been sent to your email address.",
+    "IfTheEmailExistsAResetCodeWasSent": "If the email address exists, a password reset code has been sent to it.",
+    "UpdatePasswordSuccessfully": "Password updated successfully.",
+    "UserNotFound": "User not found."
+
   },
 
   "Common": {
     "UnexpectedError": "An unexpected error occurred. Please try again later.",
-    "Unauthorized": "You are not authorized to perform this action."
+    "Unauthorized": "You are not authorized to perform this action.",
+    "Forbidden": "You do not have permission to perform this action.",
+    "NotFound": "The requested resource was not found."
   },
 
   "Validation": {
@@ -20,12 +41,10 @@
     "ContentIsRequiredLessThan20": "Content must be at least 20 characters.",
     "InvalidRatingValue": "Invalid rating value. Must be between 1 and 5.",
     "EmailRequired": "Email is required.",
-    "EmailAlreadyVerified": "Email is already verified.",
     "EmailNotVerified": "Email is not verified.",
     "InvalidEmail": "Invalid email format.",
     "PasswordRequired": "Password is required.",
     "ConfirmPasswordRequired": "Confirm password is required.",
-    "PasswordsDoNotMatch": "Passwords do not match.",
     "AddressRequired": "Address is required.",
     "PhoneRequired": "Phone number is required.",
     "Unauthorized": "You are not authorized to perform this action.",
@@ -45,7 +64,31 @@
     "NotFound": "The requested resource was not found.",
     "AccountNotActive": "This account is not active. Please contact support for more information.",
     "TrustScoreTooLow": "Your trust score is too low to perform this action.",
-    "TrustScoreInvalid": "Invalid trust score value."
-  }
+    "TrustScoreInvalid": "Invalid trust score value.",
+    "InvalidVerificationCode": "Invalid verification Code.",
+    "VerificationCodeExpired": "Verification token has expired.",
+    "VerificationCodeType": "The Verification Code Type Is Required.",
+    "VerificationCodeAlreadyUsed": "This verification code has already been used.",
+    "MediaOwnership": "You do not have permission to access this media."
+  },
 
+  "Business": {
+    "NotFound": "The requested resource was not found.",
+    "AlreadyExists": "The requested resource already exists.",
+    "InvalidData": "The provided data is invalid.",
+    "OperationFailed": "The operation failed. Please try again later.",
+    "FetchError": "An error occurred while fetching data. Please try again later.",
+    "ImageNotFound": "The requested image was not found.",
+    "ImageUploadFailed": "Image upload failed. Please try again later.",
+    "CreateBusinessFailed": "Failed to create business. Please try again later.",
+    "NameExistsForOwnerAsync": "You already have a business with this name.",
+    "BusinessCategoryNotFound": "The specified business category was not found.",
+    "Erroroccurredwhilesearchingbusinessesbyname": "An error occurred while searching businesses by name. Please try again later.",
+    "Erroroccurredwhilefetchingbranchreviews": "An error occurred while fetching branch reviews. Please try again later.",
+    "ErroroccurredwhilefetchingbusinessesWithReviews": "An error occurred while fetching businesses with reviews. Please try again later.",
+    "ErroroccurredwhilefetchingbusinessesWithBranchs": "An error occurred while fetching businesses with branches. Please try again later."
+  },
+  "Branch": {
+    "NotFound": "Not Found Branch With Id: {0}"
+  }
 }

@@ -1,1 +1,23 @@
-﻿
+﻿global using MediatR;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.HttpOverrides;
+global using Microsoft.AspNetCore.Mvc;
+global using Review_Guard.API.Extensions;
+global using Review_Guard.API.Middleware;
+global using Review_Guard.Application;
+global using Review_Guard.Application.Feature.Auth.Command.ForgotPassword;
+global using Review_Guard.Application.Feature.Auth.Command.Login.Admin;
+global using Review_Guard.Application.Feature.Auth.Command.Login.User;
+global using Review_Guard.Application.Feature.Auth.Command.Registration;
+global using Review_Guard.Application.Feature.Auth.Command.ResendVerificationCode;
+global using Review_Guard.Application.Feature.Auth.Command.ResetPassword;
+global using Review_Guard.Application.Feature.Auth.Command.VerifyEmail;
+global using Review_Guard.Application.Feature.Auth.Command.VerifyResetCode;
+global using Review_Guard.Application.Feature.Auth.DTOs.Requests;
+global using Review_Guard.Application.Feature.Auth.Queries.Logout;
+global using Review_Guard.Application.Feature.Auth.Queries.RefreshToken;
+global using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetAll;
+global using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetAllByCategoryId;
+global using Review_Guard.Domain.Enums;
+global using Review_Guard.Infrastructure;
+global using Review_Guard.Infrastructure.Presistence.Seed;

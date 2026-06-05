@@ -5,11 +5,12 @@ namespace Review_Guard.API;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(
-        this IServiceCollection services)
+    public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+
         return services;
     }
+
 }

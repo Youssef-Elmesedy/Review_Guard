@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Review_Guard.API.Errors;
 using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.Auth;
 
 namespace Review_Guard.API.Controllers;
 
@@ -29,32 +28,36 @@ public abstract class BaseController : ControllerBase
 
     private IActionResult HandleError(Result result)
     {
-        var response = new
+        var error = result.Error!;
+
+        var statusCode = HttpStatusResolver.Resolve(error.Type);
+
+        return StatusCode(statusCode, new
         {
             success = false,
-            errorCode = result.ErrorCode,
-            message = result.ErrorMessage
-        };
+            errorCode = error.Code,
+            message = error.Message
+        });
+    }
 
-        return result.ErrorCode switch
+    protected void SetRefreshTokenCookie(string token, DateTime expiresAt)
+    {
+        Response.Cookies.Append("refreshToken", token, new CookieOptions
         {
-            // Auth
-            AuthMessage.UserAlreadyExists => Conflict(response),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = expiresAt
+        });
+    }
 
-            AuthMessage.InvalidCredentials => Unauthorized(response),
+    protected string? GetRefreshTokenCookie()
+    {
+        return Request.Cookies["refreshToken"];
+    }
 
-            AuthMessage.EmailNotVerified => Unauthorized(response),
-
-            AuthMessage.RegisterationFailed => BadRequest(response),
-
-            // Common
-            "ValidationError" => BadRequest(response),
-
-            "NotFound" => NotFound(response),
-
-            "Forbidden" => StatusCode(403, response),
-
-            _ => BadRequest(response)
-        };
+    protected void DeleteRefreshTokenCookie()
+    {
+        Response.Cookies.Delete("refreshToken");
     }
 }

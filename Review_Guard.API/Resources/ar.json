@@ -3,12 +3,32 @@
     "UserAlreadyExists": "يوجد مستخدم بهذا البريد الإلكتروني",
     "InvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "EmailNotVerified": "يجب تأكيد البريد الإلكتروني أولاً",
-    "RegisterationFailed": "فشل إنشاء الحساب"
+    "EmailAlreadyVerified": "تم التحقق من البريد الإلكتروني بالفعل.",
+    "RegisterationFailed": "فشل إنشاء الحساب",
+    "LoginFailed": "فشل تسجيل الدخول",
+    "AdminLoginFailed": "فشل تسجيل دخول المشرف",
+    "AccountInactive": "هذا الحساب غير نشط",
+    "InvalidRefreshToken": "رمز التحديث غير صالح",
+    "RefreshTokenExpired": "انتهت صلاحية رمز التحديث",
+    "RefreshTokenFailed": "فشل تحديث الرمز",
+    "LogoutFailed": "فشل تسجيل الخروج",
+    "LogoutSuccessfully": "تم تسجيل الخروج بنجاح",
+    "InvalidVerificationToken": "رمز التحقق غير صالح",
+    "VerificationTokenExpired": "انتهت صلاحية رمز التحقق",
+    "EmailVerificationFailed": "فشل التحقق من البريد الإلكتروني",
+    "PasswordResetFailed": "فشل إعادة تعيين كلمة المرور",
+    "PasswordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+    "ResetPasswordCodeSentSuccessfully": "تم إرسال رمز إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.",
+    "IfTheEmailExistsAResetCodeWasSent": "إذا كان البريد الإلكتروني موجودًا، فقد تم إرسال رمز إعادة تعيين كلمة المرور إليه.",
+    "UpdatePasswordSuccessfully": "تم تحديث كلمة المرور بنجاح.",
+    "UserNotFound" : "المستخدم غير موجود."
   },
 
   "Common": {
     "UnexpectedError": "حدث خطأ غير متوقع. حاول مرة أخرى لاحقًا.",
-    "Unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء."
+    "Unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء.",
+    "Forbidden" : "ليس لديك إذن لتنفيذ هذا الإجراء.",
+    "NotFound" : "المورد المطلوب غير موجود."
   },
 
   "Validation": {
@@ -20,12 +40,10 @@
     "ContentIsRequiredLessThan20": "يجب أن يكون التعليق على الأقل 20 حرفًا.",
     "InvalidRatingValue": "قيمة التقييم غير صالحة. يجب أن تكون بين 1 و 5.",
     "EmailRequired": "البريد الإلكتروني مطلوب",
-    "EmailAlreadyVerified": "تم التحقق من البريد الإلكتروني بالفعل.",
     "EmailNotVerified": "البريد الإلكتروني غير مؤكد.",
     "InvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
     "PasswordRequired": "كلمة المرور مطلوبة",
     "ConfirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
-    "PasswordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
     "AddressRequired": "العنوان مطلوب",
     "PhoneRequired": "رقم الهاتف مطلوب",
     "Unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء.",
@@ -45,6 +63,31 @@
     "NotFound": "المورد المطلوب غير موجود.",
     "AccountNotActive": "هذا الحساب غير نشط. يرجى الاتصال بالدعم لمزيد من المعلومات.",
     "TrustScoreTooLow": "درجة الثقة الخاصة بك منخفضة جدًا لتنفيذ هذا الإجراء.",
-    "TrustScoreInvalid": "قيمة درجة الثقة غير صالحة."
+    "TrustScoreInvalid": "قيمة درجة الثقة غير صالحة.",
+    "InvalidVerificationCode": "رمز التحقق غير صالح.",
+    "VerificationCodeExpired": "انتهت صلاحية رمز التحقق.",
+    "VerificationCodeType": "نوع رمز التحقق مطلوب.",
+    "VerificationCodeAlreadyUsed": "تم استخدام رمز التحقق هذا بالفعل.",
+    "MediaOwnership": "ليس لديك إذن للوصول إلى هذا الوسائط."
+  },
+
+  "Business": {
+    "NotFound": "المورد المطلوب غير موجود.",
+    "AlreadyExists": "المورد المطلوب موجود بالفعل.",
+    "InvalidData": "البيانات المقدمة غير صالحة.",
+    "OperationFailed": "فشل العملية. حاول مرة أخرى لاحقًا.",
+    "FetchError": "حدث خطأ أثناء جلب البيانات. حاول مرة أخرى لاحقًا.",
+    "ImageNotFound": "الصورة المطلوبة غير موجودة.",
+    "ImageUploadFailed": "فشل تحميل الصورة. حاول مرة أخرى لاحقًا.",
+    "CreateBusinessFailed": "فشل إنشاء العمل التجاري. حاول مرة أخرى لاحقًا.",
+    "NameExistsForOwnerAsync": "يوجد لديك فعلا عمل تجاري بهذا الاسم.",
+    "BusinessCategoryNotFound": "فئة العمل التجاري المحددة غير موجودة.",
+    "Erroroccurredwhilesearchingbusinessesbyname": "حدث خطأ أثناء البحث عن الأعمال التجارية بالاسم. حاول مرة أخرى لاحقًا.",
+    "Erroroccurredwhilefetchingbranchreviews": "حدث خطأ أثناء جلب تقييمات الفرع. حاول مرة أخرى لاحقًا.",
+    "ErroroccurredwhilefetchingbusinessesWithReviews": "حدث خطأ أثناء جلب الأعمال التجارية مع التقييمات. حاول مرة أخرى لاحقًا.",
+    "ErroroccurredwhilefetchingbusinessesWithBranchs": "حدث خطأ أثناء جلب الأعمال التجارية مع الفروع. حاول مرة أخرى لاحقًا."
+  },
+  "Branch": {
+    "NotFound" :  "هذا الفرع بهذا المعرف: {0} غير موجود."
   }
 }

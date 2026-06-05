@@ -1,13 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Review_Guard.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("ip")]
+        public IActionResult GetIp()
+        {
+            return Ok(new
+            {
+                RemoteIp = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Forwarded = HttpContext.Request.Headers["X-Forwarded-For"].ToString(),
+                Headers = HttpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString())
+            });
+        }
+
         // GET: api/<UserController>
         [HttpGet]
         public IEnumerable<string> Get()
