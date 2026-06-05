@@ -21,14 +21,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasPrecision(5, 2).HasDefaultValue(80m);
 
         builder.Property(u => u.Status)
-            .HasConversion<string>()
-            .HasDefaultValue(AccountStatus.PendingVerification);
+            .HasDefaultValue(AccountStatus.PendingVerification)
+            .HasConversion<string>();
 
         builder.Property(u => u.ProfileImageUrl).HasMaxLength(500);
 
         builder.Property(u => u.SuspensionReason).HasMaxLength(500);
-
-        builder.Property(u => u.EmailVerificationToken).HasMaxLength(100);
 
         builder.HasIndex(u => u.Email).IsUnique();
 

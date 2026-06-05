@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -28,9 +26,6 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
 
         builder.Property(b => b.AdminNote)
             .HasMaxLength(1000);
-
-        builder.Property(b => b.LogoUrl)
-            .HasMaxLength(500);
 
         // ── Relationships ───────────────────
 

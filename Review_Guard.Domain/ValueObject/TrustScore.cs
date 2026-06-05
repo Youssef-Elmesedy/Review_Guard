@@ -39,8 +39,9 @@ public sealed class TrustScore : ValueObject
     public static TrustScore Create(decimal value)
     {
         if (value < MinValue || value > MaxValue)
-            throw new BusinessRuleViolationException(nameof(TrustScore),
-                $"TrustScore must be between {MinValue} and {MaxValue}. Got: {value}");
+            throw new DomainException(
+                "TrustScore is out of valid range.",
+                DomainMessagies.TrustScoreInvalid);
 
         return new TrustScore(Math.Round(value, 2));
     }

@@ -11,12 +11,16 @@ public sealed class EmailAddress : ValueObject
     public static EmailAddress Create(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            throw new BusinessRuleViolationException(nameof(EmailAddress), "Email cannot be empty.");
+            throw new DomainException(
+                "Email cannot be empty.",
+                DomainMessagies.EmailRequired);
 
         email = email.Trim().ToLowerInvariant();
 
         if (!IsValidEmail(email))
-            throw new BusinessRuleViolationException(nameof(EmailAddress), $"'{email}' is not a valid email address.");
+            throw new DomainException(
+                $"'{email}' is not a valid email address.",
+                DomainMessagies.InvalidEmail);
 
         return new EmailAddress(email);
     }
@@ -28,7 +32,10 @@ public sealed class EmailAddress : ValueObject
             var addr = new System.Net.Mail.MailAddress(email);
             return addr.Address == email;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     protected override IEnumerable<object> GetAtomicValues()

@@ -28,7 +28,8 @@ public class Proof : BaseEntity
     // ── Factory Methods ───────────────────────
     public static Proof CreateFromFile(Guid userId, Guid branchId, string fileUrl)
     {
-        if (string.IsNullOrWhiteSpace(fileUrl)) throw new DomainException("File URL is required.");
+        if (string.IsNullOrWhiteSpace(fileUrl)) throw new DomainException("File URL is required.",
+            DomainMessagies.ProofFileUrlRequired);
 
         return new Proof
         {
@@ -41,7 +42,7 @@ public class Proof : BaseEntity
 
     public static Proof CreateFromOrder(Guid userId, Guid branchId, string orderId)
     {
-        if (string.IsNullOrWhiteSpace(orderId)) throw new DomainException("Order ID is required.");
+        if (string.IsNullOrWhiteSpace(orderId)) throw new DomainException("Order ID is required.", DomainMessagies.ProofOrderIdRequired);
 
         return new Proof
         {
@@ -55,7 +56,7 @@ public class Proof : BaseEntity
     // ── Admin Actions ───────────────────────
     public void Verify(Guid adminId, string? note = null)
     {
-        if (Status == ProofStatus.Verified) throw new DomainException("Already verified.");
+        if (Status == ProofStatus.Verified) throw new DomainException("Already verified.", DomainMessagies.AlreadyVerified);
 
         Status = ProofStatus.Verified;
         VerifiedByAdminId = adminId;

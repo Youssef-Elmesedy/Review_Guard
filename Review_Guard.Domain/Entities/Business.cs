@@ -18,8 +18,6 @@ public class Business : BaseEntity
     public Guid? ReviewedByAdminId { get; private set; }
     public DateTime? ReviewedAt { get; private set; }
 
-    public string? LogoUrl { get; private set; }
-
     // Navigation properties 
 
     private readonly List<Proof> _proofs = new();
@@ -30,6 +28,10 @@ public class Business : BaseEntity
 
     private readonly List<Branch> _branches = new();
     public IReadOnlyCollection<Branch> Branches => _branches.AsReadOnly();
+
+    private readonly List<MediaAsset> _media = new();
+    public IReadOnlyCollection<MediaAsset> Media => _media.AsReadOnly();
+
 
     public BusinessStatus Status { get; private set; } = BusinessStatus.PendingApproval;
 
@@ -42,24 +44,43 @@ public class Business : BaseEntity
 
     public void Deactivate() { IsActive = false; Status = BusinessStatus.Inactive; SetUpdatedAt(); }
     public void Activate() { IsActive = true; Status = BusinessStatus.Active; SetUpdatedAt(); }
-    public void UpdateLogo(string logoUrl) { LogoUrl = logoUrl; SetUpdatedAt(); }
+    public void AddImage(string url, int sortOrder, bool isPrimary = false)
+    {
+        if (isPrimary)
+        {
+            foreach (var img in _media)
+                img.UnsetPrimary();
+        }
+
+        var media = MediaAsset.CreateForBusiness(Id, url, sortOrder, isPrimary);
+
+        _media.Add(media);
+
+        SetUpdatedAt();
+    }
+    public void SetPrimaryImage(Guid mediaId)
+    {
+        var media = _media.FirstOrDefault(x => x.Id == mediaId)
+            ?? throw new DomainException("Image not found", DomainMessagies.ImageNotFound);
+
+        foreach (var img in _media)
+            img.UnsetPrimary();
+
+        media.SetPrimary();
+
+        SetUpdatedAt();
+    }
 
     // ── Factory ─────────────────────────────
     public static Business Create(
         Guid ownerId,
         string name,
         string description,
-        Guid categoryId,
-        string commercialRegistrationNumber,
-        string taxNumber)
+        Guid categoryId)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Business name is required.");
+        if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Business name is required.", DomainMessagies.BusinessNameRequired);
 
-        if (string.IsNullOrWhiteSpace(description)) throw new DomainException("Business description is required.");
-
-        if (string.IsNullOrWhiteSpace(commercialRegistrationNumber)) throw new DomainException("Commercial registration number is required.");
-
-        if (string.IsNullOrWhiteSpace(taxNumber)) throw new DomainException("Tax number is required.");
+        if (string.IsNullOrWhiteSpace(description)) throw new DomainException("Business description is required.", DomainMessagies.BusinessDescriptionRequired);
 
         return new Business
         {
@@ -75,7 +96,7 @@ public class Business : BaseEntity
     // ── Branch Management ─────────────────────
     public Branch AddBranch(Guid currentUserId, string address, string city, string country, string phone, Guid managerId)
     {
-        if (!IsOwnedBy(currentUserId)) throw new DomainException("Only owner can add branches.");
+        if (!IsOwnedBy(currentUserId)) throw new DomainException("Only owner can add branches.", DomainMessagies.Unauthorized);
         var branch = Branch.Create(Id, address, city, country, phone, managerId);
         _branches.Add(branch);
         return branch;
@@ -94,7 +115,8 @@ public class Business : BaseEntity
 
     public void Reject(Guid adminId, string reason)
     {
-        if (string.IsNullOrWhiteSpace(reason)) throw new DomainException("Rejection reason is required.");
+        if (string.IsNullOrWhiteSpace(reason)) throw new DomainException("Rejection reason is required.", DomainMessagies.RejectionReasonRequired);
+
         Status = BusinessStatus.Rejected;
         ReviewedByAdminId = adminId;
         ReviewedAt = DateTime.UtcNow;
@@ -104,7 +126,7 @@ public class Business : BaseEntity
     public Proof AddOrderProof(Guid branchId, Guid userId, string orderId)
     {
         var branch = Branches.FirstOrDefault(b => b.Id == branchId)
-            ?? throw new DomainException("Branch not found.");
+            ?? throw new DomainException("Branch not found.", DomainMessagies.BranchNotFound);
 
         var proof = Proof.CreateFromOrder(userId, branchId, orderId);
         _proofs.Add(proof);

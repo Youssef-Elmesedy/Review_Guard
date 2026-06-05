@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -23,7 +21,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .HasMaxLength(2000);
 
         builder.Property(r => r.OverallRating)
-            .HasPrecision(2, 1);
+            .HasPrecision(3, 2);
 
         builder.Property(r => r.Status)
             .HasConversion<string>()
@@ -33,11 +31,20 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .HasMaxLength(1000);
 
         // ── Ratings ─────────────────────────
-        builder.Property(r => r.FoodRating).IsRequired();
-        builder.Property(r => r.ServiceRating).IsRequired();
-        builder.Property(r => r.CleanlinessRating).IsRequired();
-        builder.Property(r => r.AmbienceRating).IsRequired();
-        builder.Property(r => r.ValueRating).IsRequired();
+        builder.Property(x => x.FoodRating)
+            .HasPrecision(3, 2);
+
+        builder.Property(x => x.ServiceRating)
+            .HasPrecision(3, 2);
+
+        builder.Property(x => x.CleanlinessRating)
+            .HasPrecision(3, 2);
+
+        builder.Property(x => x.AmbienceRating)
+            .HasPrecision(3, 2);
+
+        builder.Property(x => x.ValueRating)
+            .HasPrecision(3, 2);
 
         // ── Relationships ───────────────────
 

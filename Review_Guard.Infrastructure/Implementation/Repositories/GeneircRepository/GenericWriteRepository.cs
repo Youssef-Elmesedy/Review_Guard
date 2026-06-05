@@ -1,12 +1,10 @@
-﻿using Review_Guard.Application.Abstractions.Repositories.GenericRepository;
-
-namespace Review_Guard.Infrastructure.Implementation.Repositories.GeneircRepository;
+﻿namespace Review_Guard.Infrastructure.Implementation.Repositories.GeneircRepository;
 
 internal class GenericWriteRepository<TEntity> : IGenericWriteRepository<TEntity>
     where TEntity : class
 {
-    private readonly AppDbContext _context;
-    private readonly DbSet<TEntity> _dbSet;
+    protected readonly AppDbContext _context;
+    protected readonly DbSet<TEntity> _dbSet;
 
     public GenericWriteRepository(AppDbContext context)
     {

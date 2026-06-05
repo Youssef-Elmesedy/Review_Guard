@@ -2,7 +2,6 @@
 using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Domain.Events;
-
 /// <summary>
 /// Raised when a review transitions from Pending → Approved/Rejected/Flagged.
 /// </summary>

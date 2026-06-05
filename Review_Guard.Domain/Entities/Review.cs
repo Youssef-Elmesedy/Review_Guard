@@ -13,13 +13,13 @@ public class Review : BaseEntity
     public Guid? ProofId { get; private set; }
 
     // Multi Rating 
-    public int FoodRating { get; private set; }
-    public int ServiceRating { get; private set; }
-    public int CleanlinessRating { get; private set; }
-    public int AmbienceRating { get; private set; }
-    public int ValueRating { get; private set; }
+    public decimal FoodRating { get; private set; }
+    public decimal ServiceRating { get; private set; }
+    public decimal CleanlinessRating { get; private set; }
+    public decimal AmbienceRating { get; private set; }
+    public decimal ValueRating { get; private set; } = 0;
 
-    public double OverallRating { get; private set; }
+    public decimal OverallRating { get; private set; }
     public string Title { get; private set; } = default!;
     public string Content { get; private set; } = default!;
     public ReviewStatus Status { get; private set; } = ReviewStatus.Pending;
@@ -36,11 +36,11 @@ public class Review : BaseEntity
     public static Review Create(
     Guid userId,
     Guid branchId,
-    int foodRating,
-    int serviceRating,
-    int cleanlinessRating,
-    int ambienceRating,
-    int valueRating,
+    decimal foodRating,
+    decimal serviceRating,
+    decimal cleanlinessRating,
+    decimal ambienceRating,
+    decimal valueRating,
     string title,
     string content,
     Guid? proofId = null)
@@ -52,13 +52,16 @@ public class Review : BaseEntity
         ValidateRating(valueRating);
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new DomainException("Title is required.");
+            throw new DomainException("Title is required.",
+                DomainMessagies.TitleIsRequired);
 
         if (string.IsNullOrWhiteSpace(content))
-            throw new DomainException("Content is required.");
+            throw new DomainException("Content is required.",
+                DomainMessagies.ContentIsRequired);
 
         if (content.Length < 20)
-            throw new DomainException("Content must be at least 20 characters.");
+            throw new DomainException("Content must be at least 20 characters.",
+                DomainMessagies.ContentIsRequiredLessThan20);
 
         var overall = CalculateOverall(
             foodRating,
@@ -83,20 +86,21 @@ public class Review : BaseEntity
         };
     }
 
-    private static void ValidateRating(int rating)
+    private static void ValidateRating(decimal rating)
     {
         if (rating < 1 || rating > 5)
-            throw new DomainException("Rating must be between 1 and 5.");
+            throw new DomainException("Rating must be between 1 and 5.",
+                DomainMessagies.InvalidRatingValue);
     }
 
-    private static double CalculateOverall(
-        int food,
-        int service,
-        int cleanliness,
-        int ambience,
-        int value)
+    private static decimal CalculateOverall(
+        decimal food,
+        decimal service,
+        decimal cleanliness,
+        decimal ambience,
+        decimal value)
     {
-        return Math.Round((food + service + cleanliness + ambience + value) / 5.0, 1);
+        return Math.Round((food + service + cleanliness + ambience + value) / 5.0m, 1);
     }
 
     public void Approve(Guid adminId, string? note = null)

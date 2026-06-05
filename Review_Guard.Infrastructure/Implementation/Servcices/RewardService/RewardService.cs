@@ -1,5 +1,5 @@
 ﻿using Review_Guard.Application.Abstractions.Repositories.UserRepository;
-using Review_Guard.Application.Services.RewardService;
+using Review_Guard.Application.Abstractions.Services.RewardService;
 using Review_Guard.Domain.Servcies;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.RewardService;

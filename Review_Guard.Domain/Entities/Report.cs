@@ -24,7 +24,8 @@ public class Report : BaseEntity
 
     public static Report Create(Guid reportedByUserId, Guid reviewId, ReportReason reason, string description)
     {
-        if (string.IsNullOrWhiteSpace(description)) throw new DomainException("Description is required.");
+        if (string.IsNullOrWhiteSpace(description)) throw new DomainException("Description is required.",
+            DomainMessagies.DescriptionRequired);
         return new Report
         {
             ReportedByUserId = reportedByUserId,

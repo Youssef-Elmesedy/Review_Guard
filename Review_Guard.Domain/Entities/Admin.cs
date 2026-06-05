@@ -1,4 +1,5 @@
 ﻿using Review_Guard.Domain.Common;
+using Review_Guard.Domain.Enums;
 using Review_Guard.Domain.Exceptions;
 
 namespace Review_Guard.Domain.Entities;
@@ -11,23 +12,28 @@ public class Admin : BaseEntity
     public string Email { get; private set; } = default!;
     public string PasswordHash { get; private set; } = default!;
     public bool IsActive { get; private set; } = true;
-    public bool IsSuperAdmin { get; private set; }
+    public Roles Role { get; private set; } = default!;
     public int TotalActionsPerformed { get; private set; }
     public DateTime? LastLoginAt { get; private set; }
 
+
     public static Admin Create(string fullName, string email,
-        string passwordHash, bool isSuperAdmin = false)
+        string passwordHash, Roles role)
     {
-        if (string.IsNullOrWhiteSpace(email)) throw new DomainException("Admin email is required.");
+        if (string.IsNullOrWhiteSpace(email)) throw new DomainException("Admin.EmailRequired", DomainMessagies.EmailRequired);
 
         return new Admin
         {
             FullName = fullName.Trim(),
             Email = email.ToLowerInvariant().Trim(),
             PasswordHash = passwordHash,
-            IsSuperAdmin = isSuperAdmin
+            Role = role,
         };
     }
+
+    //Navigation
+    private readonly List<UserActivity> _activities = new();
+    public IReadOnlyCollection<UserActivity> Activities => _activities.AsReadOnly();
 
     public void RecordAction() { TotalActionsPerformed++; }
     public void RecordLogin() { LastLoginAt = DateTime.UtcNow; }

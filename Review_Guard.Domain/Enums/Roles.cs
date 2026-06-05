@@ -3,17 +3,20 @@
 // user Roles With Create
 public enum Roles
 {
-    BusinessOwner = 1, // Business owners can manage their business profiles, respond to reviews, and access business-specific analytics.
-    User = 2, // Regular users can submit reviews, view business profiles, and interact with other users' reviews.
+    SuperAdmin = 1, // Super admins have full access to all system features, including user and business management, review moderation, and analytics.
+    Admin = 2,
+    BusinessOwner = 3, // Business owners can manage their business profiles, respond to reviews, and access business-specific analytics.
+    BranchManager = 4,
+    User = 5, // Regular users can submit reviews, view business profiles, and interact with other users' reviews.
 }
 
 // Account With Create Chengies With Admin
 public enum AccountStatus
 {
-    Active = 1, // Account is active and in good standing.
-    Suspended = 2,// Account is temporarily suspended, restricting access until resolved.
-    Banned = 3, // Account is permanently banned, access is revoked.
-    PendingVerification = 4 // Account is pending email verification.
+    PendingVerification = 1, // Account is pending email verification.
+    Active = 2, // Account is active and in good standing.
+    Suspended = 3,// Account is temporarily suspended, restricting access until resolved.
+    Banned = 4, // Account is permanently banned, access is revoked.
 }
 
 /// <summary>
@@ -52,7 +55,8 @@ public enum ActivityType
     EmailVerified = 6,
     PasswordChanged = 7,
     ProfileUpdated = 8,
-    SuspiciousAction = 9
+    SuspiciousAction = 9,
+    Logout = 10
 }
 
 // ReviewStatus represents the lifecycle stages of a review.
@@ -69,21 +73,21 @@ public enum ReviewStatus
 public enum BusinessStatus
 {
     /// <summary>Awaiting admin review of commercial registration and tax documents.</summary>
-    PendingApproval = 0,
+    PendingApproval = 1,
     /// <summary>Admin has approved the business page — it is fully active.</summary>
-    Active = 1,
+    Active = 2,
     /// <summary>Admin rejected the submission (e.g. invalid documents).</summary>
-    Rejected = 2,
+    Rejected = 3,
     /// <summary>Business page has been deactivated by owner or admin.</summary>
-    Inactive = 3
+    Inactive = 4
 }
 
 // CategoryStatus represents the approval status of a business category.
 public enum CategoryStatus
 {
-    Pending = 0,
-    Approved = 1,
-    Rejected = 2
+    Pending = 1,
+    Approved = 2,
+    Rejected = 3
 }
 
 // ReportStatus represents the lifecycle of a user report against a review or business.
@@ -127,4 +131,40 @@ public enum RewardType
     Bronze = 1,
     Silver = 2,
     Gold = 3
+}
+
+public enum TokenType
+{
+    VerificationEmail = 1,
+    ResetPassword = 2,
+}
+
+public enum VerificationCodeType
+{
+    EmailVerification = 1,
+    PasswordReset = 2,
+    TwoFactor = 3
+}
+public enum MediaType
+{
+    Business = 1,
+    Branch = 2
+}
+
+public enum ErrorType
+{
+    Validation,
+    NotFound,
+    Unauthorized,
+    Forbidden,
+    Conflict,
+    Failure
+}
+
+public enum MediaOwnerType
+{
+    Business = 1,
+    Branch = 2,
+    User = 3,
+    Proof = 4
 }

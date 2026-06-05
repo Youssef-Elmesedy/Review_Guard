@@ -16,8 +16,6 @@ public class User : BaseEntity
 
     // ── Email Verification ───────────────────────────────────
     public bool IsEmailVerified { get; private set; }
-    public string? EmailVerificationToken { get; private set; }
-    public DateTime? EmailVerificationTokenExpiry { get; private set; }
 
     // ── Account Status ───────────────────────────────────────
     public AccountStatus Status { get; private set; } = AccountStatus.PendingVerification;
@@ -44,12 +42,14 @@ public class User : BaseEntity
     private readonly List<UserActivity> _activities = new();
     private readonly List<Proof> _proofs = new();
     private readonly List<UserReward> _rewards = new();
+    private readonly List<VerificationCode> _verificationTokens = new();
 
     public IReadOnlyCollection<UserReward> Rewards => _rewards.AsReadOnly();
     public IReadOnlyCollection<Proof> Proofs => _proofs.AsReadOnly();
     public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
     public IReadOnlyCollection<Business> Businesses => _businesses.AsReadOnly();
     public IReadOnlyCollection<UserActivity> Activities => _activities.AsReadOnly();
+    public IReadOnlyCollection<VerificationCode> VerificationTokens => _verificationTokens.AsReadOnly();
 
     // ── Computed / ValueObjects ────────────────────────────
     public TrustScore TrustScore => TrustScore.Create(TrustScoreValue);
@@ -65,12 +65,11 @@ public class User : BaseEntity
     public static User Create(string fullName, string email, string passwordHash, Roles role = Roles.User)
     {
         if (string.IsNullOrWhiteSpace(fullName))
-            throw new DomainException("Full Name is required.");
+            throw new DomainException("Full Name is required.", DomainMessagies.FullNameRequired);
         if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Email is required.");
+            throw new DomainException("Email is required.", DomainMessagies.EmailRequired);
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException("Password hash is required.");
-
+            throw new DomainException("Password hash is required.", DomainMessagies.PasswordRequired);
         return new User
         {
             Id = Guid.NewGuid(),
@@ -92,11 +91,29 @@ public class User : BaseEntity
 
         SetUpdatedAt();
     }
+    // ── Media ─────────────────────────────────────────
+    private readonly List<MediaAsset> _mediaAssets = new();
+    public IReadOnlyCollection<MediaAsset> MediaAssets => _mediaAssets.AsReadOnly();
+
+    public void UpdateProfileImageUrl(string? url)
+    {
+        ProfileImageUrl = url;
+        SetUpdatedAt();
+    }
+    // ── Role Management ────────────────────────────────────
+    public void ChangeRole(Roles role)
+    {
+        Role = role;
+
+        SetUpdatedAt();
+    }
 
     public void ChangePassword(string newPasswordHash)
     {
         if (string.IsNullOrWhiteSpace(newPasswordHash))
-            throw new DomainException("New password hash is required.");
+            throw new DomainException(
+                "New password hash is required.",
+                DomainMessagies.PasswordRequired);
 
         PasswordHash = newPasswordHash;
         SetUpdatedAt();
@@ -106,40 +123,31 @@ public class User : BaseEntity
     public void VerifyEmail(string token)
     {
         if (IsEmailVerified)
-            throw new DomainException($"Email for {FullName} is already verified.");
-
-        if (EmailVerificationToken != token)
-            throw new DomainException("Invalid email verification token.");
-
-        if (!EmailVerificationTokenExpiry.HasValue || EmailVerificationTokenExpiry < DateTime.UtcNow)
-            throw new DomainException("Email verification token has expired.");
+            throw new DomainException(
+                $"Email for {FullName} is already verified.",
+                DomainMessagies.EmailAlreadyVerified);
 
         IsEmailVerified = true;
-        EmailVerificationToken = null;
-        EmailVerificationTokenExpiry = null;
+
         Status = AccountStatus.Active;
 
         SetUpdatedAt();
     }
 
-    public void SetEmailVerificationToken(string token, DateTime expiry)
-    {
-        EmailVerificationToken = token;
-        EmailVerificationTokenExpiry = expiry;
-        SetUpdatedAt();
-    }
 
-    public void RegenerateEmailVerificationToken()
-        => SetEmailVerificationToken(Guid.NewGuid().ToString("N"), DateTime.UtcNow.AddHours(24));
 
     // ── Account Status Management ─────────────────────────
     public void Suspend(string reason, DateTime? until = null)
     {
         if (IsBanned)
-            throw new DomainException("Account is banned and cannot be suspended.");
+            throw new DomainException(
+                "Account is banned and cannot be suspended.",
+                DomainMessagies.AccountBanned);
 
         if (string.IsNullOrWhiteSpace(reason))
-            throw new DomainException("Suspension reason is required.");
+            throw new DomainException(
+                "Suspension reason is required.",
+                DomainMessagies.SuspensionReasonRequired);
 
         Status = AccountStatus.Suspended;
         SuspensionReason = reason;
@@ -151,10 +159,14 @@ public class User : BaseEntity
     public void Ban(string reason)
     {
         if (IsBanned)
-            throw new DomainException("Account is already banned.");
+            throw new DomainException(
+                "Account is already banned.",
+                DomainMessagies.AccountAlreadyBanned);
 
         if (string.IsNullOrWhiteSpace(reason))
-            throw new DomainException("Ban reason is required.");
+            throw new DomainException(
+                "Ban reason is required.",
+                DomainMessagies.BanReasonRequired);
 
         Status = AccountStatus.Banned;
         SuspensionReason = reason;
@@ -166,7 +178,9 @@ public class User : BaseEntity
     public void Reactivate()
     {
         if (!IsSuspended)
-            throw new DomainException("Account is not suspended.");
+            throw new DomainException(
+                "Account is not suspended.",
+                DomainMessagies.AccountNotSuspended);
 
         Status = AccountStatus.Active;
         SuspensionReason = null;
@@ -188,11 +202,19 @@ public class User : BaseEntity
         CheckSuspensionExpiry();
 
         if (IsBanned)
-            throw new DomainException("Account is banned.");
+            throw new DomainException(
+                "Account is banned.",
+                DomainMessagies.AccountBanned);
+
         if (IsSuspended)
-            throw new DomainException($"Account is suspended until {SuspendedUntil?.ToShortDateString()}.");
+            throw new DomainException(
+                $"Account is suspended until {SuspendedUntil?.ToShortDateString()}.",
+                DomainMessagies.AccountSuspended);
+
         if (Status == AccountStatus.PendingVerification)
-            throw new DomainException("Email not verified.");
+            throw new DomainException(
+                "Email not verified.",
+                DomainMessagies.EmailNotVerified);
     }
 
     // ── Trust Score Management ────────────────────────────
@@ -215,10 +237,14 @@ public class User : BaseEntity
         ResetDailyReviewCountIfNeeded();
 
         if (TrustScore.RequiresProof)
-            throw new DomainException($"{FullName} (TrustScore={TrustScoreValue}) requires proof to submit reviews.");
+            throw new DomainException(
+                $"{FullName} (TrustScore={TrustScoreValue}) requires proof to submit reviews.",
+                DomainMessagies.ProofRequired);
 
         if (ReviewsSubmittedToday >= maxReviewsPerDay)
-            throw new DomainException($"You have reached the daily limit of {maxReviewsPerDay} reviews.");
+            throw new DomainException(
+                $"You have reached the daily limit of {maxReviewsPerDay} reviews.",
+                DomainMessagies.DailyReviewLimitExceeded);
     }
 
     public void RecordReviewSubmission()
@@ -250,4 +276,18 @@ public class User : BaseEntity
 
         RaiseDomainEvent(new RewardAddedEvent(Id, reward));
     }
+
+    //---------------Add EmailEvent-----------------------
+    public void RaiseRegisteredEvent(string code)
+    {
+        RaiseDomainEvent(
+            new UserRegisteredEvent(
+                Id,
+                Email,
+                FullName,
+                code
+            )
+        );
+    }
+
 }

@@ -16,7 +16,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.7" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0" />
+    <PackageReference Include="Polly" Version="8.6.6" />
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,11 +27,23 @@
     <ProjectReference Include="..\Review_Guard.Domain\Review_Guard.Domain.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="EmailTemplates\**\*.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+	
   <ItemGroup>
     <Folder Include="Common\Extensions\" />
     <Folder Include="Common\ProjectionsExtensions\" />
-    <Folder Include="Implementation\Email\" />
-    <Folder Include="Implementation\Storage\" />
+    <Folder Include="EmailTemplates\Auth\" />
+    <Folder Include="EmailTemplates\User\" />
+    <Folder Include="EmailTemplates\Review\" />
     <Folder Include="Implementation\Queries\" />
   </ItemGroup>
 

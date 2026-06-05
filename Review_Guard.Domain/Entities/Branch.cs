@@ -22,6 +22,29 @@ public class Branch : BaseEntity
     private readonly List<Review> _reviews = new();
     public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
+    private readonly List<MediaAsset> _media = new();
+    public IReadOnlyCollection<MediaAsset> Media => _media.AsReadOnly();
+
+
+    // Upload branch image
+    public void AddImage(string url, int sortOrder, bool isPrimary = false)
+    {
+        _media.Add(MediaAsset.CreateForBranch(Id, url, sortOrder, isPrimary));
+
+        SetUpdatedAt();
+    }
+    public void SetPrimaryImage(Guid mediaId)
+    {
+        var media = _media.FirstOrDefault(x => x.Id == mediaId)
+            ?? throw new DomainException("Image not found", DomainMessagies.ImageNotFound);
+
+        foreach (var img in _media)
+            img.UnsetPrimary();
+
+        media.SetPrimary();
+
+        SetUpdatedAt();
+    }
 
     // ── Rating Fields ─────────────────────────
     public decimal SimpleAverageRating { get; private set; }
@@ -33,8 +56,8 @@ public class Branch : BaseEntity
     // ── Factory ───────────────────────────────
     public static Branch Create(Guid businessId, string address, string city, string country, string phone, Guid managerId)
     {
-        if (string.IsNullOrWhiteSpace(address)) throw new DomainException("Address is required.");
-        if (string.IsNullOrWhiteSpace(phone)) throw new DomainException("Phone number is required.");
+        if (string.IsNullOrWhiteSpace(address)) throw new DomainException("Branch.AddressRequired", DomainMessagies.AddressRequired);
+        if (string.IsNullOrWhiteSpace(phone)) throw new DomainException("Branch.PhoneRequired", DomainMessagies.PhoneRequired);
 
         return new Branch
         {
@@ -51,14 +74,14 @@ public class Branch : BaseEntity
     // ── Manager Actions ───────────────────────
     public void ChangeManager(Guid currentUserId, Guid ownerId, Guid newManagerId)
     {
-        if (currentUserId != ownerId) throw new DomainException("Only owner can change manager.");
+        if (currentUserId != ownerId) throw new DomainException("Only owner can change manager.", DomainMessagies.Unauthorized);
         ManagerId = newManagerId;
         SetUpdatedAt();
     }
 
     // ── Weighted Rating Recalculation ─────────────────────────────────────────
     public void RecalculateRatings(
-     IEnumerable<(int Rating, decimal TrustWeight)> approvedReviews,
+     IEnumerable<(decimal Rating, decimal TrustWeight)> approvedReviews,
      int pendingCount)
     {
         var list = approvedReviews.ToList();

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -22,6 +20,8 @@ public class UserActivityConfiguration : IEntityTypeConfiguration<UserActivity>
 
         builder.Property(a => a.SuspicionReason).HasMaxLength(500);
 
+        builder.Ignore(a => a.Metadata);
+
         builder.Property(a => a.Metadata)
             .HasConversion(
                 v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
@@ -30,6 +30,8 @@ public class UserActivityConfiguration : IEntityTypeConfiguration<UserActivity>
             .HasColumnType("nvarchar(max)");
 
         builder.HasIndex(a => a.UserId);
+
+        builder.HasIndex(a => a.AdminId);
 
         builder.HasIndex(a => a.IsSuspicious);
 

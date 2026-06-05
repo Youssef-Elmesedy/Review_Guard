@@ -32,6 +32,7 @@ public static class WeightedAverageCalculator
             return Math.Round(items.Average(r => (decimal)r.Rating), 2);
 
         var weightedSum = items.Sum(r => r.Rating * r.TrustScore);
+
         return Math.Round(weightedSum / totalWeight, 2);
     }
 

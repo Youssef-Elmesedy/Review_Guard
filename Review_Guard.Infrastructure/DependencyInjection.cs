@@ -1,4 +1,11 @@
-﻿namespace Review_Guard.Infrastructure;
+﻿using Review_Guard.Application.Abstractions.Repositories.MediaRepository;
+using Review_Guard.Application.Abstractions.Services.MediaService;
+using Review_Guard.Application.Feature.BusinessModul.Services;
+using Review_Guard.Infrastructure.Implementation.Repositories.MediaRepository;
+using Review_Guard.Infrastructure.Implementation.Servcices.BusinessService;
+using Review_Guard.Infrastructure.Implementation.Servcices.MediaService;
+
+namespace Review_Guard.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -35,7 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IRewardService, RewardService>();
 
         services.AddScoped<IReadAdminRepository, ReadAdminRepository>();
-        //services.AddScoped<IWriteAdminRepository, WriteAdminRepository>();
+        services.AddScoped<IWriteAdminRepository, WriteAdminRepository>();
 
         services.AddScoped<IReadBranchRepository, ReadBranchRepository>();
         services.AddScoped<IWriteBranchRepository, WriteBranchRepository>();
@@ -58,43 +65,58 @@ public static class DependencyInjection
         services.AddScoped<IReadUserActivityRepository, ReadUserActivityRepository>();
         services.AddScoped<IWriteUserActivityRepository, WriteUserActivityRepository>();
 
+        services.AddScoped<IReadVerificationTokenRepository, ReadVerificationTokenRepository>();
+        services.AddScoped<IWriteVerificationTokenRepository, WriteVerificationTokenRepository>();
+
+        services.AddScoped<IReadMediaRepository, ReadMediaRepository>();
+        services.AddScoped<IWriteMediaRepository, WriteMediaRepository>();
+
         //// ── Dashboard Repositories (read-model / CQRS read side) ───────────────
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+
+        services.AddScoped<IReadBusinessService, ReadBusinessService>();
+        services.AddScoped<IWriteBusinessService, WriteBusinessService>();
+
+        services.AddScoped<IMediaService, MediaService>();
+
         //services.AddScoped<IUserDashboardRepository, UserDashboardRepository>();
         //services.AddScoped<IOwnerDashboardRepository, OwnerDashboardRepository>();
         //services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
 
         //// ── Settings ───────────────────────────────────────────────────────────
-        //services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
-        //services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
-        //services.Configure<FileStorageSettings>(configuration.GetSection("FileStorage"));
+        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
+        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.Configure<FileStorageSettings>(configuration.GetSection("FileStorage"));
 
         //// ── Application + Infrastructure Services ─────────────────────────────
-        //services.AddScoped<IJwtService, JwtService>();
-        //services.AddScoped<IPasswordHasher, PasswordHasher>();
-        //services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
-        //services.AddScoped<IEmailService, EmailService>();
-        //services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         //services.AddScoped<IRiskScoreService, RiskScoreService>();
         //services.AddScoped<IWeightedRatingService, WeightedRatingService>();
 
+        // GeoLocation Service with HttpClient and resilience policies
+        services.AddHttpClient<IGeoLocationService, GeoLocationService>()
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
+
         return services;
     }
+
 }
 
-// Extension method for configuring custom logging
-public static class LoggingExtensions
+// Migration helper to apply pending migrations on application startup
+public static class MigrationExtensions
 {
-    public static ILoggingBuilder AddCustomLogging(this ILoggingBuilder builder)
+    public static void ApplyMigrations(this IApplicationBuilder app)
     {
-        builder.ClearProviders();
-
-        builder.AddConsole(options =>
-        {
-            options.FormatterName = "colored";
-        });
-
-        builder.Services.AddSingleton<ConsoleFormatter, ColoredConsoleFormatter>();
-
-        return builder;
+        using var scope = app.ApplicationServices.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -42,7 +40,7 @@ public class ProofConfiguration : IEntityTypeConfiguration<Proof>
 
         // Proof → Branch
         builder.HasOne(p => p.Branch)
-            .WithMany() // غالبًا مش محتاج navigation في Branch
+            .WithMany()
             .HasForeignKey(p => p.BranchId)
             .OnDelete(DeleteBehavior.Restrict);
 
