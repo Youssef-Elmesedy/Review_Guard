@@ -520,7 +520,7 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.ToTable("Reviews", (string)null);
                 });
 
-            modelBuilder.Entity("Review_Guard.Domain.Entities.User", b =>
+            modelBuilder.Entity("Review_Guard.Domain.Entities.UserError", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -734,7 +734,7 @@ namespace Review_Guard.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "Manager")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -753,7 +753,7 @@ namespace Review_Guard.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "Owner")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "Owner")
                         .WithMany("Businesses")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -793,7 +793,7 @@ namespace Review_Guard.Infrastructure.Migrations
                         .WithMany("Proofs")
                         .HasForeignKey("BusinessId");
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "UserError")
                         .WithMany("Proofs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -801,7 +801,7 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.Navigation("Branch");
 
-                    b.Navigation("User");
+                    b.Navigation("UserError");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.RefreshToken", b =>
@@ -811,19 +811,19 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "UserError")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Admin");
 
-                    b.Navigation("User");
+                    b.Navigation("UserError");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.Report", b =>
                 {
-                    b.HasOne("Review_Guard.Domain.Entities.User", "ReportedByUser")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "ReportedByUser")
                         .WithMany()
                         .HasForeignKey("ReportedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -853,7 +853,7 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasForeignKey("Review_Guard.Domain.Entities.Review", "ProofId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "UserError")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -863,7 +863,7 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.Navigation("Proof");
 
-                    b.Navigation("User");
+                    b.Navigation("UserError");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.UserActivity", b =>
@@ -873,19 +873,19 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "UserError")
                         .WithMany("Activities")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Admin");
 
-                    b.Navigation("User");
+                    b.Navigation("UserError");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.UserReward", b =>
                 {
-                    b.HasOne("Review_Guard.Domain.Entities.User", null)
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", null)
                         .WithMany("Rewards")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -894,13 +894,13 @@ namespace Review_Guard.Infrastructure.Migrations
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.VerificationCode", b =>
                 {
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
+                    b.HasOne("Review_Guard.Domain.Entities.UserError", "UserError")
                         .WithMany("VerificationTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserError");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.Admin", b =>
@@ -929,7 +929,7 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.Navigation("Businesses");
                 });
 
-            modelBuilder.Entity("Review_Guard.Domain.Entities.User", b =>
+            modelBuilder.Entity("Review_Guard.Domain.Entities.UserError", b =>
                 {
                     b.Navigation("Activities");
 

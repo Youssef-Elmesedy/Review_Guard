@@ -44,7 +44,6 @@
     <Folder Include="EmailTemplates\Auth\" />
     <Folder Include="EmailTemplates\User\" />
     <Folder Include="EmailTemplates\Review\" />
-    <Folder Include="Implementation\Queries\" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ namespace Review_Guard.Application.Abstractions.Services.MediaService;
 
 /// <summary>
 /// Generic media service — single entry point for all image/file operations.
-/// Handles Business images, Branch images, User profile photos, Proof attachments.
+/// Handles Business images, Branch images, UserError profile photos, Proof attachments.
 /// Storage details are abstracted behind IFileStorageService.
 /// </summary>
 public interface IMediaService

@@ -54,7 +54,7 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .HasForeignKey(b => b.BusinessId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Branch → Manager (User)
+        // Branch → Manager (UserError)
         builder.HasOne(b => b.Manager)
             .WithMany()
             .HasForeignKey(b => b.ManagerId)

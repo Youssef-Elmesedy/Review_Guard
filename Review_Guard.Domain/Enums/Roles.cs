@@ -168,3 +168,39 @@ public enum MediaOwnerType
     User = 3,
     Proof = 4
 }
+public enum NotificationType
+{
+    // ── User ──────────────────────────────────
+    ReviewSubmitted = 1,
+    ReviewApproved = 2,
+    ReviewRejected = 3,
+    AccountSuspended = 4,
+    AccountBanned = 5,
+    AccountReactivated = 6,
+    TrustScoreIncreased = 7,
+    TrustScoreDecreased = 8,
+    RewardEarned = 9,
+    ProofVerified = 10,
+    ProofRejected = 11,
+    ProfileUpdated = 12,
+
+    // ── Business Owner ────────────────────────
+    BusinessApproved = 20,
+    BusinessRejected = 21,
+    NewReviewOnBranch = 22,
+    ReportOnReview = 23,
+
+    // ── Admin ─────────────────────────────────
+    NewUserRegistered = 40,
+    NewBusinessPending = 41,
+    NewReviewPending = 42,
+    NewReportPending = 43,
+    NewProofPending = 44
+}
+
+public enum NotificationTarget
+{
+    User = 1,
+    Admin = 2,
+    BusinessOwner = 3
+}

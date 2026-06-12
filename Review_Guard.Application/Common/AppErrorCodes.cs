@@ -1,11 +1,11 @@
-using Review_Guard.Domain.ValueObject;
 using Review_Guard.Domain.Enums;
+using Review_Guard.Domain.ValueObject;
 
 namespace Review_Guard.Application.Common;
 
 /// <summary>
 /// Centralized catalog of typed AppError instances.
-/// Usage: AppErrorCodes.Media.NotFound, AppErrorCodes.User.NotFound, etc.
+/// Usage: AppErrorCodes.Media.NotFound, AppErrorCodes.UserError.NotFound, etc.
 /// </summary>
 public static class AppErrorCodes
 {
@@ -40,41 +40,5 @@ public static class AppErrorCodes
 
         public static AppError UploadFailed(string fileName) =>
             new("Media.UploadFailed", $"Failed to upload file '{fileName}'.", ErrorType.Failure);
-    }
-
-    public static class User
-    {
-        public static readonly AppError NotFound =
-            new("User.NotFound", "User not found.", ErrorType.NotFound);
-
-        public static readonly AppError Unauthorized =
-            new("User.Unauthorized", "User not authenticated.", ErrorType.Unauthorized);
-    }
-
-    public static class Business
-    {
-        public static readonly AppError NotFound =
-            new("Business.NotFound", "Business not found.", ErrorType.NotFound);
-    }
-
-    public static class Branch
-    {
-        public static readonly AppError NotFound =
-            new("Branch.NotFound", "Branch not found.", ErrorType.NotFound);
-    }
-
-    public static class Review
-    {
-        public static readonly AppError NotFound =
-            new("Review.NotFound", "Review not found.", ErrorType.NotFound);
-
-        public static readonly AppError AlreadyExists =
-            new("Review.AlreadyExists", "You have already reviewed this branch.", ErrorType.Conflict);
-    }
-
-    public static class Report
-    {
-        public static readonly AppError NotFound =
-            new("Report.NotFound", "Report not found.", ErrorType.NotFound);
     }
 }

@@ -29,7 +29,7 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
 
         // ── Relationships ───────────────────
 
-        // Business → Owner (User)
+        // Business → Owner (UserError)
         builder.HasOne(b => b.Owner)
             .WithMany(u => u.Businesses)
             .HasForeignKey(b => b.OwnerId)

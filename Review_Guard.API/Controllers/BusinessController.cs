@@ -157,7 +157,7 @@ public class BusinessController : BaseController
         return HandleResult(result);
     }
 
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "UserError")]
     [HttpPost("CreateBusiness")]
     public async Task<IActionResult> CreateBusiness(
         [FromBody] CreateBusinessResponse response,

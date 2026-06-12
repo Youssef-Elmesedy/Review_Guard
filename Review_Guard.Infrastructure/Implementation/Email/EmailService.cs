@@ -46,7 +46,7 @@ public class EmailService : IEmailService
     public async Task SendWelcomeEmailAsync(
         string toEmail, string toName, CancellationToken ct = default)
     {
-        var body = await _renderer.RenderAsync("User/Welcome", new Dictionary<string, string>
+        var body = await _renderer.RenderAsync("UserError/Welcome", new Dictionary<string, string>
         {
             ["name"] = toName
         });
@@ -94,7 +94,7 @@ public class EmailService : IEmailService
     public async Task SendAccountSuspendedAsync(
         string toEmail, string toName, string reason, CancellationToken ct = default)
     {
-        var body = await _renderer.RenderAsync("User/AccountSuspended", new Dictionary<string, string>
+        var body = await _renderer.RenderAsync("UserError/AccountSuspended", new Dictionary<string, string>
         {
             ["name"] = toName,
             ["reason"] = reason

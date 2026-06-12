@@ -1,3 +1,5 @@
+using Microsoft.Extensions.FileProviders;
+
 namespace Review_Guard.API;
 
 public class Program
@@ -10,6 +12,12 @@ public class Program
         builder.Services.AddControllers()
             .AddJsonOptions(opts =>
             {
+                opts.JsonSerializerOptions.Converters.Add(
+                    new DecimalJsonConverter());
+
+                opts.JsonSerializerOptions.Converters.Add(
+                    new CustomDateTimeConverter());
+
                 opts.JsonSerializerOptions.PropertyNamingPolicy =
                     System.Text.Json.JsonNamingPolicy.CamelCase;
 
@@ -49,6 +57,7 @@ public class Program
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddAuthorization(); // 
         builder.Services.AddSwaggerWithAuth();
+        builder.Services.AddCustomAuthorizationHandler();
 
         /// Configure forwarded headers to correctly capture client IP and protocol when behind a reverse proxy
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -124,9 +133,19 @@ public class Program
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
 
+        // ── Rate Limiting ─────────────────────────────────────────────────────
+        app.UseMiddleware<RateLimitingMiddleware>();
+
         app.UseForwardedHeaders();
 
         app.UseStaticFiles();
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(
+                Path.Combine(app.Environment.ContentRootPath, "uploads")),
+            RequestPath = "/uploads"
+        });
 
         app.UseAuthentication();
         app.UseAuthorization();

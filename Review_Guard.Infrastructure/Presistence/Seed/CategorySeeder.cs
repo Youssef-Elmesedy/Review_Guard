@@ -77,7 +77,7 @@ public static class UserSeeder
                 var user = User.Create(
                     item.Item1,
                     item.Item2,
-                    passwordHasher.HashPassword("User@123#"),
+                    passwordHasher.HashPassword("UserError@123#"),
                     Roles.User);
 
                 user.VerifyEmail("seed-admin");

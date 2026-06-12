@@ -1,6 +1,4 @@
-﻿using Review_Guard.Domain.Enums;
-
-namespace Review_Guard.Infrastructure.Presistence.Seed;
+﻿namespace Review_Guard.Infrastructure.Presistence.Seed;
 
 #region Admin Seeder
 
@@ -29,7 +27,7 @@ public static class AdminSeeder
             var admin = Admin.Create(
                 "Youssef Elmesedy",
                 "admin@reviewguard.com",
-                passwordHasher.HashPassword("Admin@123#"),
+                passwordHasher.HashPassword("Youssef@123#"),
                 Roles.SuperAdmin);
 
             await context.Admins.AddAsync(admin);

@@ -31,7 +31,7 @@ public class ProofConfiguration : IEntityTypeConfiguration<Proof>
 
         // ── Relationships ───────────────────
 
-        // Proof → User
+        // Proof → UserError
         builder.HasOne(p => p.User)
             .WithMany(u => u.Proofs)
             .HasForeignKey(p => p.UserId)

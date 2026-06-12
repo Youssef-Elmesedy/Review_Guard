@@ -30,7 +30,7 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
 
         // ── Relationships ───────────────────
 
-        // Report → User (ReportedBy)
+        // Report → UserError (ReportedBy)
         builder.HasOne(r => r.ReportedByUser)
             .WithMany()
             .HasForeignKey(r => r.ReportedByUserId)

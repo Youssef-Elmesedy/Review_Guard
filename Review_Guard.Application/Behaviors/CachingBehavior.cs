@@ -10,7 +10,7 @@ namespace Review_Guard.Application.Behaviors;
 /// <see cref="IMemoryCache"/>. Only requests that implement <see cref="ICacheable"/>
 /// are cached; all others pass straight through.
 ///
-/// User-scoped queries (IsUserScoped = true) automatically include the current
+/// UserError-scoped queries (IsUserScoped = true) automatically include the current
 /// user's ID in the cache key to prevent cross-user data leakage.
 /// </summary>
 public sealed class CachingBehavior<TRequest, TResponse>

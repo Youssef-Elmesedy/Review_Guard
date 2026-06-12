@@ -32,7 +32,7 @@ public class MediaAssetConfiguration : IEntityTypeConfiguration<MediaAsset>
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-        // ── User Relation ───────────────────────────────────────────
+        // ── UserError Relation ───────────────────────────────────────────
         builder.HasOne(x => x.User)
             .WithMany()
             .HasForeignKey(x => x.UserId)

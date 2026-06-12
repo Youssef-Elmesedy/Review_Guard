@@ -22,6 +22,9 @@ public class AppDbContext : DbContext
     // Add Rewards DbSet
     public DbSet<UserReward> Rewards => Set<UserReward>();
 
+    // Notifications
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

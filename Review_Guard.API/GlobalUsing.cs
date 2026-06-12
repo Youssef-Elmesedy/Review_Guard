@@ -1,4 +1,4 @@
-﻿global using MediatR;
+global using MediatR;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.HttpOverrides;
 global using Microsoft.AspNetCore.Mvc;
@@ -21,3 +21,5 @@ global using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetAl
 global using Review_Guard.Domain.Enums;
 global using Review_Guard.Infrastructure;
 global using Review_Guard.Infrastructure.Presistence.Seed;
+global using Review_Guard.Application.Feature.UserModul.Dto;
+global using Review_Guard.Application.Feature.NotificationModule.DTOs;

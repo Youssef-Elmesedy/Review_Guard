@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -12,6 +11,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
         builder.Property(u => u.FullName).IsRequired().HasMaxLength(100);
+
+        builder.Property(u => u.Description).HasMaxLength(100);
+
+        builder.Property(u => u.Phone).HasMaxLength(20);
 
         builder.Property(u => u.Email).IsRequired().HasMaxLength(255);
 

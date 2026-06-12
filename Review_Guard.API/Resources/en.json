@@ -20,18 +20,14 @@
     "PasswordsDoNotMatch": "Passwords do not match.",
     "ResetPasswordCodeSentSuccessfully": "A password reset code has been sent to your email address.",
     "IfTheEmailExistsAResetCodeWasSent": "If the email address exists, a password reset code has been sent to it.",
-    "UpdatePasswordSuccessfully": "Password updated successfully.",
-    "UserNotFound": "User not found."
-
+    "UpdatePasswordSuccessfully": "Password updated successfully."
   },
-
   "Common": {
     "UnexpectedError": "An unexpected error occurred. Please try again later.",
     "Unauthorized": "You are not authorized to perform this action.",
     "Forbidden": "You do not have permission to perform this action.",
     "NotFound": "The requested resource was not found."
   },
-
   "Validation": {
     "ValidationFailed": "One or more validation errors occurred.",
     "FullNameRequired": "Full name or Name is required.",
@@ -69,9 +65,9 @@
     "VerificationCodeExpired": "Verification token has expired.",
     "VerificationCodeType": "The Verification Code Type Is Required.",
     "VerificationCodeAlreadyUsed": "This verification code has already been used.",
-    "MediaOwnership": "You do not have permission to access this media."
+    "MediaOwnership": "You do not have permission to access this media.",
+    "BranchNotFound": "Branch not found."
   },
-
   "Business": {
     "NotFound": "The requested resource was not found.",
     "AlreadyExists": "The requested resource already exists.",
@@ -90,5 +86,48 @@
   },
   "Branch": {
     "NotFound": "Not Found Branch With Id: {0}"
+  },
+  "User": {
+    "UserNotFound": "User not found.",
+    "FetchError": "An error occurred while fetching user data. Please try again later.",
+    "UpdateError": "An error occurred while updating user data. Please try again later.",
+    "AlreadySuspended": "This user is already suspended.",
+    "AlreadyBanned": "This user is already banned.",
+    "NotSuspended": "This user is not suspended.",
+    "Forbidden": "You do not have permission to suspend or ban this user.",
+    "PasswordWrong": "Current password is incorrect.",
+    "PasswordUpdateFailed": "Failed to update password. Please try again later.",
+    "GetAllFailed": "Failed to fetch users. Please try again later.",
+    "GetActivitiesFailed": "Failed to fetch user activities. Please try again later.",
+    "InvalidFileType": "Invalid file type. Allowed types are: {0}.",
+    "FileTooLarge": "File size exceeds the maximum allowed size of {0} bytes."
+  },
+  "Review": {
+    "NotFound": "Review not found.",
+    "AlreadyReviewed": "You have already submitted a review for this branch.",
+    "CreateFailed": "Failed to submit review. Please try again.",
+    "ApproveFailed": "Failed to approve review.",
+    "RejectFailed": "Failed to reject review.",
+    "DeleteFailed": "Failed to delete review.",
+    "FetchFailed": "Failed to fetch review.",
+    "AlreadyProcessed": "This review has already been processed.",
+    "Forbidden": "You are not allowed to perform this action on this review."
+  },
+  "Proof": {
+    "NotFound": "Proof not found.",
+    "CreateFailed": "Failed to submit proof. Please try again.",
+    "VerifyFailed": "Failed to verify proof.",
+    "RejectFailed": "Failed to reject proof.",
+    "FetchFailed": "Failed to fetch proof.",
+    "Forbidden": "You are not allowed to perform this action on this proof."
+  },
+  "Report": {
+    "NotFound": "Report not found.",
+    "AlreadyReported": "You have already reported this review.",
+    "CreateFailed": "Failed to submit report. Please try again.",
+    "ResolveFailed": "Failed to resolve report.",
+    "DismissFailed": "Failed to dismiss report.",
+    "FetchFailed": "Failed to fetch report.",
+    "Forbidden": "You are not allowed to perform this action on this report."
   }
 }

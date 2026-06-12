@@ -63,7 +63,7 @@ internal sealed class AuthService : IAuthService
 
 
     // ─────────────────────────────────────────────────────────
-    // Register User
+    // Register UserError
     // ─────────────────────────────────────────────────────────
     public async Task<Result<AuthResponseDto>> RegisterUserAsync(
     RegisterUserDto request,
@@ -92,7 +92,7 @@ internal sealed class AuthService : IAuthService
                             user.Id,
                             _currentUser.AdminId,
                             ActivityType.Register,
-                            "Registered User",
+                            "Registered UserError",
                             ct);
 
         user.RaiseRegisteredEvent(VeificationCode.Code);
@@ -122,7 +122,7 @@ internal sealed class AuthService : IAuthService
     }
 
     // ─────────────────────────────────────────────────────────
-    // Login User
+    // Login UserError
     // ─────────────────────────────────────────────────────────
     public async Task<Result<AuthResponseDto>> LoginUserAsync(
         LoginDto request,
@@ -130,7 +130,7 @@ internal sealed class AuthService : IAuthService
     {
         try
         {
-            _logger.LogInformation("Login attempt for User: {Email}", request.Email);
+            _logger.LogInformation("Login attempt for UserError: {Email}", request.Email);
 
             var user = await _readUser.FindFirstAsync(
                 u => u.Email == request.Email, ct);
@@ -155,7 +155,7 @@ internal sealed class AuthService : IAuthService
                             user.Id,
                             _currentUser.AdminId,
                             ActivityType.Login,
-                            "Login User",
+                            "Login UserError",
                             ct);
 
             await _unitOfWork.ExecuteAsync(async () =>
@@ -170,7 +170,7 @@ internal sealed class AuthService : IAuthService
                 adminId: null,
                 ipAddress: _currentUser.IpAddress);
 
-            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
+            _logger.LogInformation("UserError {UserId} logged in successfully", user.Id);
 
             return Result<AuthResponseDto>.Success(new AuthResponseDto(
                 accessToken,
@@ -316,12 +316,12 @@ internal sealed class AuthService : IAuthService
                 token.UserId,
                 token.AdminId,
                 ActivityType.Logout,
-                _currentUser.IsAdmin ? "Logou Admin" : "Logout User",
+                _currentUser.IsAdmin ? "Logou Admin" : "Logout UserError",
                 ct);
 
             await _unitOfWork.ExecuteAsync(async () =>
             {
-                await _refreshTokenService.RevokeAsync(token, _currentUser.IpAddress!, "User Logged Out", ct);
+                await _refreshTokenService.RevokeAsync(token, _currentUser.IpAddress!, "UserError Logged Out", ct);
 
                 await _writeUserActivity.AddAsync(await userActivity, ct);
 
@@ -329,7 +329,7 @@ internal sealed class AuthService : IAuthService
             }
             , ct);
 
-            _logger.LogInformation("User {UserId} logged out successfully", _currentUser.UserId);
+            _logger.LogInformation("UserError {UserId} logged out successfully", _currentUser.UserId);
 
             return Result<string>.Success(_stringLocalizer[AuthMessage.LogoutSuccessfully]);
         }
@@ -406,7 +406,7 @@ internal sealed class AuthService : IAuthService
             {
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.NotFound(
-                        "User or admin not found.",
+                        "UserError or admin not found.",
                         _stringLocalizer[CommonMessage.NotFound]));
             }
 
@@ -585,7 +585,7 @@ internal sealed class AuthService : IAuthService
                 await _writeUserActivity.AddAsync(userActivity, ct);
             }, ct);
 
-            _logger.LogInformation("Email verified for User {UserId}", user.Id);
+            _logger.LogInformation("Email verified for UserError {UserId}", user.Id);
         }
         catch (DomainException)
         {
@@ -610,7 +610,7 @@ internal sealed class AuthService : IAuthService
 
             if (user is null)
                 return Result<bool>.Failure(AppErrorsCataloge.NotFound(
-                    "User not found.",
+                    "UserError not found.",
                     _stringLocalizer[AuthMessage.UserNotFound]));
 
             if (!_passwordHasher.VerifyPassword(password, user.PasswordHash))
@@ -658,7 +658,7 @@ internal sealed class AuthService : IAuthService
     }
 
     // ─────────────────────────────────────────────────────────
-    // Login Log User Active 
+    // Login Log UserError Active 
     // ─────────────────────────────────────────────────────────
     private async Task<UserActivity> LogUserActivityAsync(
      Guid? userId,
@@ -722,7 +722,7 @@ internal sealed class AuthService : IAuthService
 
         if (user is null)
             throw new DomainException(
-                "User not found.",
+                "UserError not found.",
                 "NotFound");
 
         return (verificationcode, user);

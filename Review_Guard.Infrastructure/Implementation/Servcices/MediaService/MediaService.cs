@@ -9,7 +9,7 @@ namespace Review_Guard.Infrastructure.Implementation.Servcices.MediaService;
 
 /// <summary>
 /// The single brain for all media operations.
-/// Handles Business, Branch, User profile, and Proof attachments generically.
+/// Handles Business, Branch, UserError profile, and Proof attachments generically.
 /// </summary>
 internal sealed class MediaService : IMediaService
 {
@@ -89,7 +89,7 @@ internal sealed class MediaService : IMediaService
             ? existing.Max(m => m.SortOrder) + 1
             : 0;
 
-        // For User profile: only 1 allowed, replace existing
+        // For UserError profile: only 1 allowed, replace existing
         if (ownerType == MediaOwnerType.User)
         {
             if (files.Count > 1)

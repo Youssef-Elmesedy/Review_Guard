@@ -1,4 +1,4 @@
-﻿// Global using directives for the Review_Guard.Infrastructure project
+// Global using directives for the Review_Guard.Infrastructure project
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage;
@@ -56,3 +56,8 @@ global using System.Collections.Concurrent;
 global using System.Linq.Expressions;
 global using System.Text;
 global using System.Text.Json;
+global using Review_Guard.Application.Abstractions.Repositories.NotificationRepository;
+global using Review_Guard.Application.Abstractions.Services.NotificationService;
+global using Review_Guard.Infrastructure.Implementation.Repositories.NotificationRepository;
+global using Review_Guard.Infrastructure.Implementation.Servcices.NotificationService;
+global using Review_Guard.Domain.Enums;

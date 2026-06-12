@@ -9,9 +9,6 @@ public class LocalFileStorageService : IFileStorageService
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<LocalFileStorageService> _logger;
 
-    private static readonly string[] AllowedTypes =
-        { "application/pdf", "image/jpeg", "image/jpg", "image/png", "image/webp" };
-
     public LocalFileStorageService(
         IOptions<FileStorageSettings> settings, IWebHostEnvironment env,
         ILogger<LocalFileStorageService> logger)
@@ -24,9 +21,6 @@ public class LocalFileStorageService : IFileStorageService
     public async Task<FileUploadResult> UploadAsync(
         Stream fileStream, string fileName, string contentType, string folder, CancellationToken ct = default)
     {
-        if (!IsAllowedContentType(contentType))
-            throw new InvalidOperationException($"Content type {contentType} is not allowed.");
-
         try
         {
             var ext = Path.GetExtension(fileName);
@@ -79,6 +73,15 @@ public class LocalFileStorageService : IFileStorageService
         if (string.IsNullOrWhiteSpace(contentType))
             return false;
 
-        return AllowedTypes.Contains(contentType.ToLowerInvariant());
+        var normalized = contentType.ToLowerInvariant();
+
+        return _settings.AllowedTypes
+            .Any(x => x.Equals(normalized, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public bool IsAllowedFileSize(long fileSize)
+    {
+        return fileSize > 0 &&
+               fileSize <= _settings.MaxFileSizeBytes;
     }
 }

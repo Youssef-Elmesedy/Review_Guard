@@ -82,7 +82,7 @@ public class CurrentUserService : ICurrentUserService
 
     public string? UserAgent =>
         _httpContextAccessor.HttpContext?
-            .Request.Headers["User-Agent"]
+            .Request.Headers["UserError-Agent"]
             .FirstOrDefault();
 
     public string? RefreshToken =>

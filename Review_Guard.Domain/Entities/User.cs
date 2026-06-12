@@ -10,6 +10,8 @@ public class User : BaseEntity
 {
     // ── Core Info ─────────────────────────────────────────────
     public string FullName { get; private set; } = string.Empty;
+    public string? Description { get; private set; }
+    public string? Phone { get; private set; }
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public Roles Role { get; private set; } = Roles.User;
@@ -84,12 +86,36 @@ public class User : BaseEntity
     }
 
     // ── Profile ────────────────────────────────────────────
-    public void UpdateProfile(string? fullName, string? lastName, string? profileImageUrl)
+    public void UpdateProfile(
+    string? fullName,
+    string? description,
+    string? phone)
     {
-        if (!string.IsNullOrWhiteSpace(fullName)) FullName = fullName;
-        if (!string.IsNullOrWhiteSpace(profileImageUrl)) ProfileImageUrl = profileImageUrl;
+        var changed = false;
 
-        SetUpdatedAt();
+        if (!string.IsNullOrWhiteSpace(fullName) &&
+            !string.Equals(FullName, fullName, StringComparison.Ordinal))
+        {
+            FullName = fullName;
+            changed = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(description) &&
+            !string.Equals(Description, description, StringComparison.Ordinal))
+        {
+            Description = description;
+            changed = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(phone) &&
+            !string.Equals(Phone, phone, StringComparison.Ordinal))
+        {
+            Phone = phone;
+            changed = true;
+        }
+
+        if (changed)
+            SetUpdatedAt();
     }
     // ── Media ─────────────────────────────────────────
     private readonly List<MediaAsset> _mediaAssets = new();
@@ -98,6 +124,7 @@ public class User : BaseEntity
     public void UpdateProfileImageUrl(string? url)
     {
         ProfileImageUrl = url;
+
         SetUpdatedAt();
     }
     // ── Role Management ────────────────────────────────────

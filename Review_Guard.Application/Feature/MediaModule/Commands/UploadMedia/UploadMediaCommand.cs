@@ -8,7 +8,7 @@ namespace Review_Guard.Application.Feature.MediaModule.Commands.UploadMedia;
 
 /// <summary>
 /// Uploads one or more files and attaches them to an owner entity.
-/// Handles: Business images | Branch images | User profile photo | Proof attachments.
+/// Handles: Business images | Branch images | UserError profile photo | Proof attachments.
 /// </summary>
 public sealed record UploadMediaCommand(
     Guid                    OwnerId,

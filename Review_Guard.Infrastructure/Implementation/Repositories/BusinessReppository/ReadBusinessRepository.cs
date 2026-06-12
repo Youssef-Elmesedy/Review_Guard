@@ -28,7 +28,7 @@ internal sealed class ReadBusinessRepository : GenericReadRepository<Business>, 
             })
             .Select(x => new BusinessRatingDto(
                 x.BusinessId,
-                x.Total == 0 ? 0 : x.WeightedSum / x.Total,
+                Math.Round(x.Total == 0 ? 0 : x.WeightedSum / x.Total, 2),
                 x.Total
             ))
             .ToDictionaryAsync(x => x.BusinessId, ct);
@@ -49,7 +49,7 @@ internal sealed class ReadBusinessRepository : GenericReadRepository<Business>, 
             })
             .Select(x => new BusinessRatingDto(
                 x.BusinessId,
-                x.Total == 0 ? 0 : x.WeightedSum / x.Total,
+                Math.Round(x.Total == 0 ? 0 : x.WeightedSum / x.Total, 2),
                 x.Total
             ))
             .ToDictionaryAsync(x => x.BusinessId, ct);
