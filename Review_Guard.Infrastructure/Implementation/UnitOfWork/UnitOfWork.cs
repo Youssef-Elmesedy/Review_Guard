@@ -1,5 +1,4 @@
-﻿using Review_Guard.Application.Common.Events;
-using Review_Guard.Domain.Common;
+﻿using Review_Guard.Domain.Common;
 
 namespace Review_Guard.Infrastructure.Implementation.UnitOfWork;
 
@@ -29,9 +28,9 @@ internal sealed class UnitOfWork : IUnitOfWork, IAsyncDisposable
 
                 await _context.SaveChangesAsync(ct);
 
-                await DispatchDomainEventsAsync(ct);
-
                 await transaction.CommitAsync(ct);
+
+                await DispatchDomainEventsAsync(ct);
             }
             catch
             {

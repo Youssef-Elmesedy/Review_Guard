@@ -119,6 +119,7 @@
     "VerifyFailed": "Failed to verify proof.",
     "RejectFailed": "Failed to reject proof.",
     "FetchFailed": "Failed to fetch proof.",
+    "Required": "Proof is required.",
     "Forbidden": "You are not allowed to perform this action on this proof."
   },
   "Report": {

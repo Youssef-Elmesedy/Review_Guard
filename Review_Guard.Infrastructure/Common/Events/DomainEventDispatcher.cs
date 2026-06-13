@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Review_Guard.Application.Common.Events;
 using Review_Guard.Domain.Common;
 
 namespace Review_Guard.Infrastructure.Common.Events;
@@ -13,11 +12,10 @@ public class DomainEventDispatcher : IDomainEventDispatcher
         _mediator = mediator;
     }
 
-    public async Task DispatchAsync(IEnumerable<IDomainEvent> events)
+    public Task DispatchAsync(IEnumerable<IDomainEvent> events)
     {
-        foreach (var domainEvent in events)
-        {
-            await _mediator.Publish(domainEvent);
-        }
+        return Task.WhenAll(
+            events.Select(e => _mediator.Publish(e))
+        );
     }
 }

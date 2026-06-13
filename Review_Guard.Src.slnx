@@ -1,7 +1,4 @@
 <Solution>
-  <Folder Name="/.claude/">
-    <File Path="settings.local.json" />
-  </Folder>
   <Project Path="Review_Guard.API/Review_Guard.API.csproj" />
   <Project Path="Review_Guard.Application/Review_Guard.Application.csproj" />
   <Project Path="Review_Guard.Domain/Review_Guard.Domain.csproj" />

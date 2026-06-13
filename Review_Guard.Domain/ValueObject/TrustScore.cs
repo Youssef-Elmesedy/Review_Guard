@@ -15,7 +15,7 @@ public sealed class TrustScore : ValueObject
 {
     public const decimal MinValue = 0m;
     public const decimal MaxValue = 100m;
-    public const decimal DefaultValue = 80m;
+    public const decimal DefaultValue = 10m;
 
     // Level thresholds
     public const decimal LowTrustUpperBound = 39m;  // 0–39  → LowTrust
