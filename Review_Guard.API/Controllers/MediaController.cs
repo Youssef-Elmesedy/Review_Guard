@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Review_Guard.Application.Feature.MediaModule.Commands.DeleteAllMedia;
 using Review_Guard.Application.Feature.MediaModule.Commands.DeleteMedia;
 using Review_Guard.Application.Feature.MediaModule.Commands.ReorderMedia;
@@ -7,7 +5,6 @@ using Review_Guard.Application.Feature.MediaModule.Commands.SetPrimaryMedia;
 using Review_Guard.Application.Feature.MediaModule.Commands.UploadMedia;
 using Review_Guard.Application.Feature.MediaModule.DTOs;
 using Review_Guard.Application.Feature.MediaModule.Queries.GetMediaByOwner;
-using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.API.Controllers;
 
@@ -49,10 +46,10 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(typeof(IReadOnlyList<MediaAssetResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByOwner(
         MediaOwnerType ownerType,
-        Guid           ownerId,
+        Guid ownerId,
         CancellationToken ct)
     {
-        var query  = new GetMediaByOwnerQuery(ownerId, ownerType);
+        var query = new GetMediaByOwnerQuery(ownerId, ownerType);
         var result = await _mediator.Send(query, ct);
         return HandleResult(result);
     }
@@ -76,13 +73,13 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(typeof(IReadOnlyList<MediaUploadResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Upload(
-        MediaOwnerType       ownerType,
-        Guid                 ownerId,
+        MediaOwnerType ownerType,
+        Guid ownerId,
         [FromForm] IFormFileCollection files,
-        CancellationToken    ct)
+        CancellationToken ct)
     {
         var command = new UploadMediaCommand(ownerId, ownerType, files.ToList());
-        var result  = await _mediator.Send(command, ct);
+        var result = await _mediator.Send(command, ct);
         return HandleResult(result);
     }
 
@@ -95,12 +92,12 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetPrimary(
         MediaOwnerType ownerType,
-        Guid           ownerId,
-        Guid           mediaId,
+        Guid ownerId,
+        Guid mediaId,
         CancellationToken ct)
     {
         var command = new SetPrimaryMediaCommand(ownerId, ownerType, mediaId);
-        var result  = await _mediator.Send(command, ct);
+        var result = await _mediator.Send(command, ct);
         return HandleResult(result);
     }
 
@@ -113,12 +110,12 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(
         MediaOwnerType ownerType,
-        Guid           ownerId,
-        Guid           mediaId,
+        Guid ownerId,
+        Guid mediaId,
         CancellationToken ct)
     {
         var command = new DeleteMediaCommand(ownerId, ownerType, mediaId);
-        var result  = await _mediator.Send(command, ct);
+        var result = await _mediator.Send(command, ct);
         return HandleResult(result);
     }
 
@@ -131,11 +128,11 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteAll(
         MediaOwnerType ownerType,
-        Guid           ownerId,
+        Guid ownerId,
         CancellationToken ct)
     {
         var command = new DeleteAllMediaCommand(ownerId, ownerType);
-        var result  = await _mediator.Send(command, ct);
+        var result = await _mediator.Send(command, ct);
         return HandleResult(result);
     }
 
@@ -148,13 +145,13 @@ public sealed class MediaController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Reorder(
-        MediaOwnerType    ownerType,
-        Guid              ownerId,
+        MediaOwnerType ownerType,
+        Guid ownerId,
         [FromBody] ReorderMediaDto dto,
         CancellationToken ct)
     {
         var command = new ReorderMediaCommand(ownerId, ownerType, dto.OrderedIds);
-        var result  = await _mediator.Send(command, ct);
+        var result = await _mediator.Send(command, ct);
         return HandleResult(result);
     }
 }

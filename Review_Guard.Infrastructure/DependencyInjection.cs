@@ -1,3 +1,5 @@
+using Review_Guard.Application.Abstractions.Repositories.BusinessCategoryRepository;
+using Review_Guard.Infrastructure.Implementation.Repositories.BusinessCategoryRepository;
 using Review_Guard.Application.Feature.ReviewModul.Services;
 using Review_Guard.Application.Feature.ProofModul.Services;
 using Review_Guard.Application.Feature.ReportModul.Services;
@@ -59,7 +61,8 @@ public static class DependencyInjection
         services.AddScoped<IReadBranchRepository, ReadBranchRepository>();
         services.AddScoped<IWriteBranchRepository, WriteBranchRepository>();
 
-        services.AddScoped<IReadBusinessRepository, ReadBusinessRepository>();
+services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryRepository>();
+                services.AddScoped<IReadBusinessRepository, ReadBusinessRepository>();
         services.AddScoped<IWriteBusinessRepository, WriteBusinessRepository>();
 
         services.AddScoped<IReadProofRepository, ReadProofRepository>();

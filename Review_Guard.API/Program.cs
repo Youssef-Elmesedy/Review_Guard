@@ -136,6 +136,9 @@ public class Program
         // ── Rate Limiting ─────────────────────────────────────────────────────
         app.UseMiddleware<RateLimitingMiddleware>();
 
+        // Strict per-second throttle (max 10 req/sec per client) — runs after the per-minute limiter
+        app.UseMiddleware<StrictRateLimitingMiddleware>();
+
         app.UseForwardedHeaders();
 
         app.UseStaticFiles();

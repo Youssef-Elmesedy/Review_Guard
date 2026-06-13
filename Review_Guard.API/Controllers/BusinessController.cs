@@ -1,4 +1,8 @@
-﻿using Review_Guard.Application.Feature.BusinessModul.Common.Command;
+using Review_Guard.Application.Feature.BusinessModul.Common.Command;
+using Review_Guard.Application.Feature.BusinessModul.Common.Command.ApproveBusiness;
+using Review_Guard.Application.Feature.BusinessModul.Common.Command.DeleteBusiness;
+using Review_Guard.Application.Feature.BusinessModul.Common.Command.RejectBusiness;
+using Review_Guard.Application.Feature.BusinessModul.Common.Command.UpdateBusiness;
 using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetAllBusiness;
 using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetAllBusinessWithReview;
 using Review_Guard.Application.Feature.BusinessModul.Common.Queries.GetByBranchIdWithReviews;
@@ -157,7 +161,10 @@ public class BusinessController : BaseController
         return HandleResult(result);
     }
 
-    [Authorize(Roles = "UserError")]
+    /// <summary>
+    /// Register a new business (starts as PendingApproval, owner only).
+    /// </summary>
+    [Authorize(Roles = "User, BusinessOwner")]
     [HttpPost("CreateBusiness")]
     public async Task<IActionResult> CreateBusiness(
         [FromBody] CreateBusinessResponse response,
@@ -165,6 +172,58 @@ public class BusinessController : BaseController
     {
         var result = await _mediator.Send(new CreateBusinessCommand(response), ct);
 
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Update business name/description. Owner only.
+    /// </summary>
+    [Authorize(Roles = "BusinessOwner")]
+    [HttpPut("{businessId:guid}")]
+    public async Task<IActionResult> UpdateBusiness(
+        Guid businessId,
+        [FromBody] UpdateBusinessRequest request,
+        CancellationToken ct = default)
+    {
+        var response = new UpdateBusinessResponse(
+            businessId, request.Name, request.Description, Guid.Empty, Guid.Empty, default);
+
+        var result = await _mediator.Send(new UpdateBusinessCommand(response), ct);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Delete (deactivate) a business. Owner or Admin.
+    /// </summary>
+    [Authorize(Roles = "BusinessOwner,Admin,SuperAdmin")]
+    [HttpDelete("{businessId:guid}")]
+    public async Task<IActionResult> DeleteBusiness(Guid businessId, CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new DeleteBusinessCommand(businessId), ct);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// [Admin] Approve a business pending approval.
+    /// </summary>
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    [HttpPut("{businessId:guid}/approve")]
+    public async Task<IActionResult> ApproveBusiness(
+        Guid businessId, [FromBody] AdminBusinessActionRequest request, CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new ApproveBusinessCommand(businessId, request.Note), ct);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// [Admin] Reject a business pending approval, with a reason.
+    /// </summary>
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    [HttpPut("{businessId:guid}/reject")]
+    public async Task<IActionResult> RejectBusiness(
+        Guid businessId, [FromBody] AdminBusinessActionRequest request, CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new RejectBusinessCommand(businessId, request.Note ?? string.Empty), ct);
         return HandleResult(result);
     }
 }

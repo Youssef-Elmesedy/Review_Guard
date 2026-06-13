@@ -44,6 +44,17 @@ public class Business : BaseEntity
 
     public void Deactivate() { IsActive = false; Status = BusinessStatus.Inactive; SetUpdatedAt(); }
     public void Activate() { IsActive = true; Status = BusinessStatus.Active; SetUpdatedAt(); }
+
+    /// <summary>Owner-only update of basic business info. Resets approval to pending if previously rejected.</summary>
+    public void UpdateInfo(Guid currentUserId, string? name, string? description)
+    {
+        if (!IsOwnedBy(currentUserId)) throw new DomainException("Only owner can update business.", DomainMessagies.Unauthorized);
+
+        if (!string.IsNullOrWhiteSpace(name)) Name = name;
+        if (!string.IsNullOrWhiteSpace(description)) Description = description;
+
+        SetUpdatedAt();
+    }
     public void AddImage(string url, int sortOrder, bool isPrimary = false)
     {
         if (isPrimary)

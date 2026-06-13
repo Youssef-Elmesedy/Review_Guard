@@ -82,7 +82,13 @@
     "Erroroccurredwhilesearchingbusinessesbyname": "حدث خطأ أثناء البحث عن الأعمال التجارية بالاسم. حاول مرة أخرى لاحقًا.",
     "Erroroccurredwhilefetchingbranchreviews": "حدث خطأ أثناء جلب تقييمات الفرع. حاول مرة أخرى لاحقًا.",
     "ErroroccurredwhilefetchingbusinessesWithReviews": "حدث خطأ أثناء جلب الأعمال التجارية مع التقييمات. حاول مرة أخرى لاحقًا.",
-    "ErroroccurredwhilefetchingbusinessesWithBranchs": "حدث خطأ أثناء جلب الأعمال التجارية مع الفروع. حاول مرة أخرى لاحقًا."
+    "ErroroccurredwhilefetchingbusinessesWithBranchs": "حدث خطأ أثناء جلب الأعمال التجارية مع الفروع. حاول مرة أخرى لاحقًا.",
+    "UpdateFailed": "فشل تحديث البيزنس.",
+    "DeleteFailed": "فشل حذف البيزنس.",
+    "ApproveFailed": "فشل قبول البيزنس.",
+    "RejectFailed": "فشل رفض البيزنس.",
+    "AlreadyProcessed": "تمت معالجة هذا البيزنس من قبل.",
+    "CreatedBusinessExists": "لديك بالفعل عمل تجاري بهذا الاسم: {0} ومعرف المستخدم: {1} و لايمكن اضافه اكثر من بيزنيزس."
   },
   "Branch": {
     "NotFound": "هذا الفرع بهذا المعرف: {0} غير موجود."

@@ -1,4 +1,4 @@
-﻿namespace Review_Guard.Application.Feature.BusinessModul;
+namespace Review_Guard.Application.Feature.BusinessModul;
 
 public static class BusinessMessage
 {
@@ -30,4 +30,16 @@ public static class BusinessMessage
 
     // branches Messages
     public const string BrancheNotFound = "Branch.NotFound";
+
+    public const string BusinessUpdateFailed = "Business.UpdateFailed";
+
+    public const string BusinessDeleteFailed = "Business.DeleteFailed";
+
+    public const string BusinessApproveFailed = "Business.ApproveFailed";
+
+    public const string BusinessRejectFailed = "Business.RejectFailed";
+
+    public const string BusinessAlreadyProcessed = "Business.AlreadyProcessed";
+
+    public const string CreatedBusinessExists = "Business.CreatedBusinessExists";
 }

@@ -21,3 +21,7 @@ public record UpdateBusinessResponse
      Guid BusinessCategoryId,
      BusinessStatus Status
 );
+
+public sealed record UpdateBusinessRequest(string? Name, string? Description);
+
+public sealed record AdminBusinessActionRequest(string? Note);

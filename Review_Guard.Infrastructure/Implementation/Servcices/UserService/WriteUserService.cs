@@ -178,13 +178,7 @@ internal sealed class WriteUserService : IWriteUserService
 
             // Invalidate cache
             await _cache.RemoveAsync($"user:profile:{userId}", ct);
-
-            // 🔔 Notify user
-            await _notifications.NotifyAllAdminsAsync
-                (NotificationType.ProfileUpdated,
-                "Profile Updated",
-                "Your profile has been updated.",
-                userId.ToString(), "User ", ct);
+            await _cache.RemoveByPrefixAsync("user:list:", ct);
 
             return Result.Success();
         }
@@ -255,6 +249,7 @@ internal sealed class WriteUserService : IWriteUserService
             await _uow.SaveChangesAsync(ct);
 
             await _cache.RemoveAsync($"user:profile:{userId}", ct);
+            await _cache.RemoveByPrefixAsync("user:list:", ct);
 
             // 🔔 Notify user
             await _notifications.NotifyUserAsync(
@@ -293,6 +288,7 @@ internal sealed class WriteUserService : IWriteUserService
             await _uow.SaveChangesAsync(ct);
 
             await _cache.RemoveAsync($"user:profile:{userId}", ct);
+            await _cache.RemoveByPrefixAsync("user:list:", ct);
 
             // 🔔 Notify user
             await _notifications.NotifyUserAsync(
@@ -331,6 +327,7 @@ internal sealed class WriteUserService : IWriteUserService
             await _uow.SaveChangesAsync(ct);
 
             await _cache.RemoveAsync($"user:profile:{userId}", ct);
+            await _cache.RemoveByPrefixAsync("user:list:", ct);
 
             // 🔔 Notify user
             await _notifications.NotifyUserAsync(

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Localization;
 using Review_Guard.Application.Abstractions.Services.CurrentUserService;
 using Review_Guard.Application.Common;
 using Review_Guard.Application.Common.CommonMessages;
@@ -6,7 +6,6 @@ using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Application.Feature.Auth;
 using Review_Guard.Application.Feature.Auth.DTOs.Requests;
 using Review_Guard.Application.Feature.Auth.DTOs.Responses;
-using Review_Guard.Domain.Enums;
 using Review_Guard.Domain.Exceptions;
 using System.Security;
 
@@ -34,12 +33,13 @@ internal sealed class AuthService : IAuthService
     private readonly ICurrentUserService _currentUser;
     private readonly IEmailService _emailService;
     private readonly IGeoLocationService _geoLocationService;
+    private readonly INotificationService _notifications;
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AuthService> _logger;
     private readonly IStringLocalizer<AuthService> _stringLocalizer;
 
-    public AuthService(IReadAdminRepository readAdmin, IWriteAdminRepository writeAdmin, IReadUserRepository readUser, IWriteUserRepository writeUser, IReadVerificationTokenRepository readVerificationToken, IWriteVerificationTokenRepository wrietVerifiedToken, IReadUserActivityRepository readUserActivity, IWriteUserActivityRepository writeUserActivity, IJwtService jwtService, IPasswordHasher passwordHasher, IRefreshTokenService refreshTokenService, ICurrentUserService currentUser, IEmailService emailService, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IStringLocalizer<AuthService> stringLocalizer, IVerificationCodeService verificationTokenService, IGeoLocationService geoLocationService)
+    public AuthService(IReadAdminRepository readAdmin, IWriteAdminRepository writeAdmin, IReadUserRepository readUser, IWriteUserRepository writeUser, IReadVerificationTokenRepository readVerificationToken, IWriteVerificationTokenRepository wrietVerifiedToken, IReadUserActivityRepository readUserActivity, IWriteUserActivityRepository writeUserActivity, IJwtService jwtService, IPasswordHasher passwordHasher, IRefreshTokenService refreshTokenService, ICurrentUserService currentUser, IEmailService emailService, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IStringLocalizer<AuthService> stringLocalizer, IVerificationCodeService verificationTokenService, IGeoLocationService geoLocationService, INotificationService notifications)
     {
         _readAdmin = readAdmin;
         _writeAdmin = writeAdmin;
@@ -59,6 +59,7 @@ internal sealed class AuthService : IAuthService
         _stringLocalizer = stringLocalizer;
         _verificationTokenService = verificationTokenService;
         _geoLocationService = geoLocationService;
+        _notifications = notifications;
     }
 
 
@@ -104,6 +105,13 @@ internal sealed class AuthService : IAuthService
             await _writeUserActivity.AddAsync(userActivity, ct);
 
         }, ct);
+
+        // 🔔 Notify all admins about the new registration
+        await _notifications.NotifyAllAdminsAsync(
+            NotificationType.NewUserRegistered,
+            "New user registered",
+            $"{user.FullName} ({user.Email}) just joined the platform.",
+            user.Id.ToString(), "User", ct);
 
         var accessToken = _jwtService.GenerateUserToken(user);
 

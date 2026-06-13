@@ -82,7 +82,13 @@
     "Erroroccurredwhilesearchingbusinessesbyname": "An error occurred while searching businesses by name. Please try again later.",
     "Erroroccurredwhilefetchingbranchreviews": "An error occurred while fetching branch reviews. Please try again later.",
     "ErroroccurredwhilefetchingbusinessesWithReviews": "An error occurred while fetching businesses with reviews. Please try again later.",
-    "ErroroccurredwhilefetchingbusinessesWithBranchs": "An error occurred while fetching businesses with branches. Please try again later."
+    "ErroroccurredwhilefetchingbusinessesWithBranchs": "An error occurred while fetching businesses with branches. Please try again later.",
+    "UpdateFailed": "Failed to update business.",
+    "DeleteFailed": "Failed to delete business.",
+    "ApproveFailed": "Failed to approve business.",
+    "RejectFailed": "Failed to reject business.",
+    "AlreadyProcessed": "This business has already been processed.",
+    "CreatedBusinessExists": "You already have a business with this name: {0} and user ID: {1}, and you cannot add more than one business."
   },
   "Branch": {
     "NotFound": "Not Found Branch With Id: {0}"

@@ -61,3 +61,5 @@ global using Review_Guard.Application.Abstractions.Services.NotificationService;
 global using Review_Guard.Infrastructure.Implementation.Repositories.NotificationRepository;
 global using Review_Guard.Infrastructure.Implementation.Servcices.NotificationService;
 global using Review_Guard.Domain.Enums;
+global using Review_Guard.Application.Abstractions.Repositories.BusinessCategoryRepository;
+global using Review_Guard.Infrastructure.Implementation.Repositories.BusinessCategoryRepository;
