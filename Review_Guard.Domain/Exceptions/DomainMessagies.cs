@@ -6,6 +6,12 @@ public static class DomainMessagies
     public const string FullNameRequired =
     "Validation.FullNameRequired";
 
+    public const string UserUniqueFullName =
+        "Validation.UserUniqueFullName";
+
+    public const string UserUniquePhone =
+        "Validation.UserUniquePhone";
+
     public const string EmailRequired =
         "Validation.EmailRequired";
 
@@ -14,6 +20,9 @@ public static class DomainMessagies
 
     public const string PasswordRequired =
         "Validation.PasswordRequired";
+
+    public const string PasswordUnchanged =
+        "Validation.PasswordUnchanged";
 
     public const string ConfirmPasswordRequired =
         "Validation.ConfirmPasswordRequired";

@@ -31,10 +31,13 @@
   "Validation": {
     "ValidationFailed": "One or more validation errors occurred.",
     "FullNameRequired": "Full name or Name is required.",
+    "UserUniqueFullName": "A user with this full name already exists.",
+    "UserUniquePhone": "A user with this phone number already exists.",
     "DescriptionRequired": "Description is required.",
     "TitleIsRequired": "Title is required.",
     "ContentIsRequired": "Content is required.",
     "ContentIsRequiredLessThan20": "Content must be at least 20 characters.",
+    "PasswordUnchanged": "The new password is the same as the current password.",
     "InvalidRatingValue": "Invalid rating value. Must be between 1 and 5.",
     "EmailRequired": "Email is required.",
     "EmailNotVerified": "Email is not verified.",
@@ -106,7 +109,10 @@
     "GetAllFailed": "Failed to fetch users. Please try again later.",
     "GetActivitiesFailed": "Failed to fetch user activities. Please try again later.",
     "InvalidFileType": "Invalid file type. Allowed types are: {0}.",
-    "FileTooLarge": "File size exceeds the maximum allowed size of {0} bytes."
+    "FileTooLarge": "File size exceeds the maximum allowed size of {0} bytes.",
+    "Norecentdataavailable": "No recent data available.",
+    "UpdateSuccess": "User data updated successfully.",
+    "PasswordUpdateSuccess": "Password updated successfully."
   },
   "Review": {
     "NotFound": "Review not found.",

@@ -1,12 +1,6 @@
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Abstractions.Services.CurrentUserService;
-using Review_Guard.Application.Common;
 using Review_Guard.Application.Common.CommonMessages;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.Auth;
 using Review_Guard.Application.Feature.Auth.DTOs.Requests;
 using Review_Guard.Application.Feature.Auth.DTOs.Responses;
-using Review_Guard.Domain.Exceptions;
 using System.Security;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.Auth;
@@ -14,7 +8,6 @@ namespace Review_Guard.Infrastructure.Implementation.Servcices.Auth;
 internal sealed class AuthService : IAuthService
 {
     private readonly IReadAdminRepository _readAdmin;
-    private readonly IWriteAdminRepository _writeAdmin;
 
     private readonly IReadUserRepository _readUser;
     private readonly IWriteUserRepository _writeUser;
@@ -22,7 +15,6 @@ internal sealed class AuthService : IAuthService
     private readonly IReadVerificationTokenRepository _readVerificationCode;
     private readonly IWriteVerificationTokenRepository _WrietVerifiedToken;
 
-    private readonly IReadUserActivityRepository _readUserActivity;
     private readonly IWriteUserActivityRepository _writeUserActivity;
 
     private readonly IVerificationCodeService _verificationTokenService;
@@ -39,15 +31,13 @@ internal sealed class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IStringLocalizer<AuthService> _stringLocalizer;
 
-    public AuthService(IReadAdminRepository readAdmin, IWriteAdminRepository writeAdmin, IReadUserRepository readUser, IWriteUserRepository writeUser, IReadVerificationTokenRepository readVerificationToken, IWriteVerificationTokenRepository wrietVerifiedToken, IReadUserActivityRepository readUserActivity, IWriteUserActivityRepository writeUserActivity, IJwtService jwtService, IPasswordHasher passwordHasher, IRefreshTokenService refreshTokenService, ICurrentUserService currentUser, IEmailService emailService, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IStringLocalizer<AuthService> stringLocalizer, IVerificationCodeService verificationTokenService, IGeoLocationService geoLocationService, INotificationService notifications)
+    public AuthService(IReadAdminRepository readAdmin, IReadUserRepository readUser, IWriteUserRepository writeUser, IReadVerificationTokenRepository readVerificationToken, IWriteVerificationTokenRepository wrietVerifiedToken, IWriteUserActivityRepository writeUserActivity, IJwtService jwtService, IPasswordHasher passwordHasher, IRefreshTokenService refreshTokenService, ICurrentUserService currentUser, IEmailService emailService, IUnitOfWork unitOfWork, ILogger<AuthService> logger, IStringLocalizer<AuthService> stringLocalizer, IVerificationCodeService verificationTokenService, IGeoLocationService geoLocationService, INotificationService notifications)
     {
         _readAdmin = readAdmin;
-        _writeAdmin = writeAdmin;
         _readUser = readUser;
         _writeUser = writeUser;
         _readVerificationCode = readVerificationToken;
         _WrietVerifiedToken = wrietVerifiedToken;
-        _readUserActivity = readUserActivity;
         _writeUserActivity = writeUserActivity;
         _jwtService = jwtService;
         _passwordHasher = passwordHasher;
@@ -324,12 +314,13 @@ internal sealed class AuthService : IAuthService
                 token.UserId,
                 token.AdminId,
                 ActivityType.Logout,
-                _currentUser.IsAdmin ? "Logou Admin" : "Logout UserError",
+                _currentUser.IsAdmin ? "Admin Logged Out" : "User Logged Out",
                 ct);
 
             await _unitOfWork.ExecuteAsync(async () =>
             {
-                await _refreshTokenService.RevokeAsync(token, _currentUser.IpAddress!, "UserError Logged Out", ct);
+                await _refreshTokenService.RevokeAsync(token, _currentUser.IpAddress!,
+                    _currentUser.IsAdmin ? "Admin Logged Out" : "User Logged Out", ct);
 
                 await _writeUserActivity.AddAsync(await userActivity, ct);
 
@@ -358,22 +349,18 @@ internal sealed class AuthService : IAuthService
             var tokenValue = _currentUser.RefreshToken;
 
             if (string.IsNullOrWhiteSpace(tokenValue))
-            {
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
                         "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
-            }
 
             var token = await _refreshTokenService.GetAsync(tokenValue, ct);
 
             if (token is null)
-            {
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
                         "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
-            }
 
             try
             {
@@ -387,58 +374,48 @@ internal sealed class AuthService : IAuthService
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
             }
 
-            if (!token.IsActive)
-            {
+            if (token.IsExpired)
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
                         "Refresh token expired.",
                         _stringLocalizer[AuthMessage.RefreshTokenExpired]));
-            }
 
             User? user = null;
             Admin? admin = null;
-
             if (token.UserId.HasValue)
-            {
                 user = await _readUser
                     .GetByIdAsync(token.UserId.Value, ct);
-            }
 
             if (token.AdminId.HasValue)
-            {
                 admin = await _readAdmin
                     .GetByIdAsync(token.AdminId.Value, ct);
-            }
 
             if (user is null && admin is null)
-            {
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.NotFound(
                         "UserError or admin not found.",
                         _stringLocalizer[CommonMessage.NotFound]));
-            }
 
             string accessToken;
-
             if (user is not null)
-            {
                 accessToken =
                     _jwtService.GenerateUserToken(user);
-            }
             else
-            {
                 accessToken =
                     _jwtService.GenerateAdminToken(admin!);
-            }
 
-            var newRefreshToken =
-                 await _refreshTokenService.RotateAsync(token, _currentUser.IpAddress!, ct);
+
+            RefreshToken? oldOrNewToken = null;
+            if (token.IsActive)
+                oldOrNewToken = token;
+            else
+                oldOrNewToken = await _refreshTokenService.RotateAsync(token, _currentUser.IpAddress!, ct);
 
             return Result<AuthResponseDto>.Success(
                 new AuthResponseDto(
                     accessToken,
-                    newRefreshToken.Token,
-                    newRefreshToken.ExpiresAtUtc,
+                    oldOrNewToken.Token,
+                    oldOrNewToken.ExpiresAtUtc,
                     user?.Role.ToString() ?? "Super Admin",
                     user?.Id ?? admin!.Id,
                     user?.Email ?? admin!.Email));
@@ -561,6 +538,7 @@ internal sealed class AuthService : IAuthService
         return Result<MessageResponseDto>.Success(
             new MessageResponseDto(_stringLocalizer[AuthMessage.UpdatePasswordSuccessfully]));
     }
+
     // ─────────────────────────────────────────────────────────
     // Login Verify Email
     // ─────────────────────────────────────────────────────────

@@ -1,4 +1,3 @@
-using Review_Guard.Application.Feature.UserModul.Dto;
 using Review_Guard.Domain.Entities;
 using System.Linq.Expressions;
 
@@ -10,6 +9,8 @@ public static class GetUserProjection
         u => new UserProfileResponse(
             u.Id,
             u.FullName,
+            u.Description ?? "not assigned",
+            u.Phone ?? "not provided",
             u.Email,
             u.IsEmailVerified,
             u.ProfileImageUrl,
@@ -26,6 +27,8 @@ public static class GetUserProjection
         u => new UserListItemDto(
             u.Id,
             u.FullName,
+            u.Description ?? "not assigned",
+            u.Phone ?? "not provided",
             u.Email,
             u.Role.ToString(),
             u.Status.ToString(),

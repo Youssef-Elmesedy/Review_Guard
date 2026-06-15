@@ -100,7 +100,7 @@ services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryReposito
 
         services.AddScoped<IMediaService, MediaService>();
 
-        services.AddScoped<IReadUserService, RseadUserService>();
+        services.AddScoped<IReadUserService, ReadUserService>();
         services.AddScoped<IWriteUserService, WriteUserService>();
 
         // ── Review ────────────────────────────────────────────────────────────

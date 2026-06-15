@@ -30,8 +30,8 @@ public sealed class RateLimitingMiddleware
         ILogger<RateLimitingMiddleware> logger,
         IConfiguration configuration)
     {
-        _next    = next;
-        _logger  = logger;
+        _next = next;
+        _logger = logger;
         _options = configuration.GetSection("RateLimiting").Get<RateLimitOptions>()
                    ?? new RateLimitOptions();
     }
@@ -45,13 +45,13 @@ public sealed class RateLimitingMiddleware
             return;
         }
 
-        var key        = BuildKey(context);
-        var now        = DateTime.UtcNow;
+        var key = BuildKey(context);
+        var now = DateTime.UtcNow;
         var windowEdge = now.AddSeconds(-_options.WindowSeconds);
 
-        var window  = _windows.GetOrAdd(key, _ => new Queue<DateTime>());
+        var window = _windows.GetOrAdd(key, _ => new Queue<DateTime>());
         bool denied;
-        int  retryAfterSeconds;
+        int retryAfterSeconds;
 
         lock (window)
         {
@@ -78,19 +78,19 @@ public sealed class RateLimitingMiddleware
                 "Rate limit hit | Key={Key} | Path={Path}",
                 key, context.Request.Path);
 
-            context.Response.StatusCode  = (int)HttpStatusCode.TooManyRequests;
+            context.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
             context.Response.ContentType = "application/json";
-            context.Response.Headers["Retry-After"]       = retryAfterSeconds.ToString();
+            context.Response.Headers["Retry-After"] = retryAfterSeconds.ToString();
             context.Response.Headers["X-RateLimit-Limit"] = _options.RequestsPerWindow.ToString();
             context.Response.Headers["X-RateLimit-Remaining"] = "0";
 
             var body = JsonSerializer.Serialize(new
             {
-                success    = false,
-                errorCode  = "RateLimit.Exceeded",
-                message    = $"Too many requests. Retry after {retryAfterSeconds}s.",
+                success = false,
+                errorCode = "RateLimit.Exceeded",
+                message = $"Too many requests. Retry after {retryAfterSeconds}s.",
                 retryAfterSeconds,
-                timestamp  = now
+                timestamp = now
             }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             await context.Response.WriteAsync(body);
@@ -105,9 +105,9 @@ public sealed class RateLimitingMiddleware
                 var remaining = Math.Max(0, _options.RequestsPerWindow - window.Count);
                 if (!context.Response.Headers.ContainsKey("X-RateLimit-Limit"))
                 {
-                    context.Response.Headers["X-RateLimit-Limit"]     = _options.RequestsPerWindow.ToString();
+                    context.Response.Headers["X-RateLimit-Limit"] = _options.RequestsPerWindow.ToString();
                     context.Response.Headers["X-RateLimit-Remaining"] = remaining.ToString();
-                    context.Response.Headers["X-RateLimit-Window"]    = _options.WindowSeconds.ToString();
+                    context.Response.Headers["X-RateLimit-Window"] = _options.WindowSeconds.ToString();
                 }
             }
             return Task.CompletedTask;
@@ -136,7 +136,7 @@ public sealed class RateLimitingMiddleware
     private static bool ShouldBypass(HttpContext ctx)
     {
         var path = ctx.Request.Path.Value ?? string.Empty;
-        return path.StartsWith("/health",  StringComparison.OrdinalIgnoreCase)
+        return path.StartsWith("/health", StringComparison.OrdinalIgnoreCase)
             || path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase)
             || path.StartsWith("/favicon", StringComparison.OrdinalIgnoreCase);
     }
@@ -161,6 +161,6 @@ public sealed class RateLimitingMiddleware
 /// <summary>Bound from appsettings "RateLimiting" section.</summary>
 public sealed class RateLimitOptions
 {
-    public int RequestsPerWindow { get; set; } = 60;
-    public int WindowSeconds     { get; set; } = 60;
+    public int RequestsPerWindow { get; set; } = 25;
+    public int WindowSeconds { get; set; } = 60;
 }

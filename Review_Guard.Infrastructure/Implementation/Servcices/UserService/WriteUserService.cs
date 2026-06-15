@@ -1,12 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.Auth;
-using Review_Guard.Application.Feature.UserModul;
-using Review_Guard.Application.Feature.UserModul.Dto;
-using Review_Guard.Application.Feature.UserModul.UserService;
-using Review_Guard.Domain.Exceptions;
+using Review_Guard.Domain.Rules;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.UserService;
 
@@ -160,54 +153,71 @@ internal sealed class WriteUserService : IWriteUserService
         }
     }
 
-    public async Task<Result> UpdateProfileAsync(
+    public async Task<Result<string>> UpdateProfileAsync(
         Guid userId, UpdateProfileRequest request, CancellationToken ct = default)
     {
         try
         {
             var user = await _readRepo.GetByIdAsync(userId, ct);
+
             if (user is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(
+                return Result<string>.Failure(AppErrorsCataloge.NotFound(
                     UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
 
-            user.UpdateProfile(request.FullName, request.description, request.phone);
+            UserBusinessRules.UserMustBeUniqueFullName(user, await _readRepo.AnyAsync(u => u.FullName == request.FullName && u.Id != userId, ct));
 
-            await _writeRepo.UpdateAsync(user, ct);
+            UserBusinessRules.UserMustBeUniquePhone(user, await _readRepo.AnyAsync(u => u.Phone == request.Phone && u.Id != userId, ct));
 
-            await _uow.SaveChangesAsync(ct);
+            var changed = user.UpdateProfile(request.FullName, request.Descriiption, request.Phone);
 
-            // Invalidate cache
-            await _cache.RemoveAsync($"user:profile:{userId}", ct);
-            await _cache.RemoveByPrefixAsync("user:list:", ct);
+            if (changed)
+            {
+                await _writeRepo.UpdateAsync(user, ct);
 
-            return Result.Success();
+                await _uow.SaveChangesAsync(ct);
+
+                // Invalidate cache
+                await _cache.RemoveAsync($"user:profile:{userId}", ct);
+
+                await _cache.RemoveByPrefixAsync("user:list:", ct);
+
+                return Result<string>.Success(_localizer[UserMessage.UserUpdateSuccess]);
+            }
+
+            return Result<string>.Success(_localizer[UserMessage.Norecentdataavailable]);
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result<string>.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating profile for {UserId}", userId);
-            return Result.Failure(AppErrorsCataloge.Failure(
+            return Result<string>.Failure(AppErrorsCataloge.Failure(
                 UserMessage.UserUpdateError, _localizer[UserMessage.UserUpdateError]));
         }
     }
 
     // ── ChangePassword ────────────────────────────────────────────────────
-    public async Task<Result> ChangePasswordAsync(
+    public async Task<Result<string>> ChangePasswordAsync(
         Guid userId, ChangePasswordRequest request, CancellationToken ct = default)
     {
         try
         {
             var user = await _readRepo.GetByIdAsync(userId, ct);
             if (user is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(
+                return Result<string>.Failure(AppErrorsCataloge.NotFound(
                     UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
 
             if (!_hasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
-                return Result.Failure(AppErrorsCataloge.Validation(
-                    UserMessage.PasswordWrong, _localizer[UserMessage.PasswordWrong]));
+                return Result<string>.Failure(AppErrorsCataloge.Validation(
+                    _localizer[UserMessage.PasswordWrong], _localizer[UserMessage.PasswordWrong]));
+
+            if (_hasher.VerifyPassword(request.NewPassword, user.PasswordHash))
+                return Result<string>.Failure(
+                    AppErrorsCataloge.Validation(
+                        _localizer[DomainMessagies.PasswordUnchanged],
+                        _localizer[DomainMessagies.PasswordUnchanged]));
 
             var newHash = _hasher.HashPassword(request.NewPassword);
 
@@ -217,16 +227,17 @@ internal sealed class WriteUserService : IWriteUserService
 
             await _uow.SaveChangesAsync(ct);
 
-            return Result.Success();
+            return Result<string>.Success(_localizer[UserMessage.PasswordUpdateSuccess]);
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result<string>.Failure(AppErrorsCataloge
+                .Validation(_localizer[ex.ErrorCode], _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error changing password for {UserId}", userId);
-            return Result.Failure(AppErrorsCataloge.Failure(
+            return Result<string>.Failure(AppErrorsCataloge.Failure(
                 UserMessage.PasswordUpdateFailed, _localizer[UserMessage.PasswordUpdateFailed]));
         }
     }
@@ -263,7 +274,7 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
@@ -302,7 +313,7 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
@@ -341,7 +352,7 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {

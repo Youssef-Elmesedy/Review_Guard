@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Review_Guard.Application.Abstractions.Storage;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.UserModul.Dto;
 
 namespace Review_Guard.Application.Feature.UserModul.UserService;
 
@@ -9,10 +7,10 @@ public interface IWriteUserService
 {
     Task<Result<FileUploadResult?>> UpdateProfileImage(Guid userId, IFormFile ImageFile, CancellationToken ct = default);
 
-    Task<Result> UpdateProfileAsync(
+    Task<Result<string>> UpdateProfileAsync(
         Guid userId, UpdateProfileRequest request, CancellationToken ct = default);
 
-    Task<Result> ChangePasswordAsync(
+    Task<Result<string>> ChangePasswordAsync(
         Guid userId, ChangePasswordRequest request, CancellationToken ct = default);
 
     Task<Result> SuspendUserAsync(

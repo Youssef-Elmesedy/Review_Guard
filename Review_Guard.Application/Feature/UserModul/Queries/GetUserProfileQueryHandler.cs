@@ -1,9 +1,7 @@
 ﻿using MediatR;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.UserModul.Dto;
 using Review_Guard.Application.Feature.UserModul.UserService;
 
-namespace Review_Guard.Application.Feature.UserModul.Command.Query;
+namespace Review_Guard.Application.Feature.UserModul.Queries;
 
 internal sealed class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, Result<UserProfileResponse>>
 {

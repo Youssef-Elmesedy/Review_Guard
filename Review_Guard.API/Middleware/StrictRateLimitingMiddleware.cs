@@ -34,8 +34,8 @@ public sealed class StrictRateLimitingMiddleware
         ILogger<StrictRateLimitingMiddleware> logger,
         IConfiguration configuration)
     {
-        _next    = next;
-        _logger  = logger;
+        _next = next;
+        _logger = logger;
         _options = configuration.GetSection("StrictRateLimiting").Get<StrictRateLimitOptions>()
                    ?? new StrictRateLimitOptions();
     }
@@ -48,7 +48,7 @@ public sealed class StrictRateLimitingMiddleware
             return;
         }
 
-        var key           = BuildKey(context);
+        var key = BuildKey(context);
         var currentSecond = DateTime.UtcNow.Ticks / TimeSpan.TicksPerSecond;
 
         var bucket = _buckets.GetOrAdd(key, _ => new Bucket());
@@ -59,7 +59,7 @@ public sealed class StrictRateLimitingMiddleware
             if (bucket.Second != currentSecond)
             {
                 bucket.Second = currentSecond;
-                bucket.Count  = 0;
+                bucket.Count = 0;
             }
 
             bucket.Count++;
@@ -72,15 +72,15 @@ public sealed class StrictRateLimitingMiddleware
                 "Per-second rate limit exceeded | Key={Key} | Path={Path} | Count={Count}",
                 key, context.Request.Path, countThisSecond);
 
-            context.Response.StatusCode  = (int)HttpStatusCode.TooManyRequests;
+            context.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
             context.Response.ContentType = "application/json";
             context.Response.Headers["Retry-After"] = "1";
 
             var body = JsonSerializer.Serialize(new
             {
-                success   = false,
+                success = false,
                 errorCode = "RateLimit.TooManyRequestsPerSecond",
-                message   = $"Too many requests. Max {_options.RequestsPerSecond} requests/second per client.",
+                message = $"Too many requests. Max {_options.RequestsPerSecond} requests/second per client.",
                 retryAfterSeconds = 1
             }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
@@ -109,7 +109,7 @@ public sealed class StrictRateLimitingMiddleware
     private static bool ShouldBypass(HttpContext ctx)
     {
         var path = ctx.Request.Path.Value ?? string.Empty;
-        return path.StartsWith("/health",  StringComparison.OrdinalIgnoreCase)
+        return path.StartsWith("/health", StringComparison.OrdinalIgnoreCase)
             || path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase)
             || path.StartsWith("/favicon", StringComparison.OrdinalIgnoreCase);
     }
@@ -127,7 +127,7 @@ public sealed class StrictRateLimitingMiddleware
     private sealed class Bucket
     {
         public long Second;
-        public int  Count;
+        public int Count;
     }
 }
 

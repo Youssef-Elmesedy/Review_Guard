@@ -86,7 +86,7 @@ public class User : BaseEntity
     }
 
     // ── Profile ────────────────────────────────────────────
-    public void UpdateProfile(
+    public bool UpdateProfile(
     string? fullName,
     string? description,
     string? phone)
@@ -116,6 +116,8 @@ public class User : BaseEntity
 
         if (changed)
             SetUpdatedAt();
+
+        return changed;
     }
     // ── Media ─────────────────────────────────────────
     private readonly List<MediaAsset> _mediaAssets = new();
@@ -137,12 +139,14 @@ public class User : BaseEntity
 
     public void ChangePassword(string newPasswordHash)
     {
+
         if (string.IsNullOrWhiteSpace(newPasswordHash))
             throw new DomainException(
                 "New password hash is required.",
                 DomainMessagies.PasswordRequired);
 
         PasswordHash = newPasswordHash;
+
         SetUpdatedAt();
     }
 

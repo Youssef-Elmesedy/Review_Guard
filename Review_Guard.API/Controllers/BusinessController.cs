@@ -186,7 +186,7 @@ public class BusinessController : BaseController
         CancellationToken ct = default)
     {
         var response = new UpdateBusinessResponse(
-            businessId, request.Name, request.Description, Guid.Empty, Guid.Empty, default);
+            businessId, request.Name!, request.Description!, Guid.Empty, Guid.Empty, default);
 
         var result = await _mediator.Send(new UpdateBusinessCommand(response), ct);
         return HandleResult(result);

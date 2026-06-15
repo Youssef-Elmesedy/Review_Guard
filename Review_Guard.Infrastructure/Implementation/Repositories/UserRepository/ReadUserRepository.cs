@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Feature.UserModul.Dto;
-using Review_Guard.Domain.Enums;
-using Review_Guard.Domain.Exceptions;
-
-namespace Review_Guard.Infrastructure.Implementation.Repositories.UserRepository;
+﻿namespace Review_Guard.Infrastructure.Implementation.Repositories.UserRepository;
 
 internal sealed class ReadUserRepository : GenericReadRepository<User>, IReadUserRepository
 {

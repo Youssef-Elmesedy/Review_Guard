@@ -31,10 +31,13 @@
   "Validation": {
     "ValidationFailed": "حدثت أخطاء في التحقق من البيانات.",
     "FullNameRequired": "الاسم الكامل مطلوب",
+    "UserUniqueFullName": "يوجد مستخدم بهذا الاسم الكامل بالفعل.",
+    "UserUniquePhone": "يوجد مستخدم بهذا الرقم بالفعل.",
     "DescriptionRequired": "الوصف مطلوب.",
     "TitleIsRequired": "العنوان مطلوب.",
     "ContentIsRequired": "التعليق مطلوب.",
     "ContentIsRequiredLessThan20": "يجب أن يكون التعليق على الأقل 20 حرفًا.",
+    "PasswordUnchanged": "كلمة المرور الجديدة هي نفسها كلمة المرور الحالية.",
     "InvalidRatingValue": "قيمة التقييم غير صالحة. يجب أن تكون بين 1 و 5.",
     "EmailRequired": "البريد الإلكتروني مطلوب",
     "EmailNotVerified": "البريد الإلكتروني غير مؤكد.",
@@ -106,7 +109,10 @@
     "GetAllFailed": "فشل جلب المستخدمين. حاول مرة أخرى لاحقًا.",
     "GetActivitiesFailed": "فشل جلب أنشطة المستخدم. حاول مرة أخرى لاحقًا.",
     "InvalidFileType": "نوع الملف غير صالح. الأنواع المسموح بها هي: {0}.",
-    "FileTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به وهو {0} بايت."
+    "FileTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به وهو {0} بايت.",
+    "Norecentdataavailable": "There is no recent data to update.",
+    "UpdateSuccess": "تم تحديث بيانات المستخدم بنجاح.",
+    "PasswordUpdateSuccess": "تم تحديث كلمة المرور بنجاح."
   },
   "Review": {
     "NotFound": "لم يتم العثور على التقييم.",

@@ -18,4 +18,7 @@ public static class UserMessage
     public const string FileTooLarge = "User.FileTooLarge";
     public const string UserIdRequired = "User.IdRequired";
     public const string FileImageRequired = "User.FileImageRequired";
+    public const string Norecentdataavailable = "User.Norecentdataavailable";
+    public const string UserUpdateSuccess = "User.UpdateSuccess";
+    public const string PasswordUpdateSuccess = "User.PasswordUpdateSuccess";
 }

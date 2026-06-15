@@ -59,7 +59,7 @@ public class Program
         builder.Services.AddSwaggerWithAuth();
         builder.Services.AddCustomAuthorizationHandler();
 
-        /// Configure forwarded headers to correctly capture client IP and protocol when behind a reverse proxy
+        // Configure forwarded headers to correctly capture client IP and protocol when behind a reverse proxy
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders =

@@ -36,4 +36,20 @@ public static class UserBusinessRules
                 $"Your trust score ({user.TrustScoreValue:F1}) is too low for this action.",
                 DomainMessagies.TrustScoreTooLow);
     }
+
+    public static void UserMustBeUniqueFullName(User user, bool fullNameExists)
+    {
+        if (fullNameExists)
+            throw new DomainException(
+                "A user with this full name already exists.",
+                DomainMessagies.UserUniqueFullName);
+    }
+
+    public static void UserMustBeUniquePhone(User user, bool phoneExists)
+    {
+        if (phoneExists)
+            throw new DomainException(
+                "A user with this phone number already exists.",
+                DomainMessagies.UserUniquePhone);
+    }
 }

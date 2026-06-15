@@ -1,40 +1,28 @@
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Abstractions.Services.CurrentUserService;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.Auth;
-using Review_Guard.Application.Feature.UserModul;
-using Review_Guard.Application.Feature.UserModul.Dto;
-using Review_Guard.Application.Feature.UserModul.Mapping;
-using Review_Guard.Application.Feature.UserModul.Specification;
-using Review_Guard.Application.Feature.UserModul.UserService;
-using Review_Guard.Domain.Exceptions;
-
 namespace Review_Guard.Infrastructure.Implementation.Servcices.UserService;
 
-internal sealed class RseadUserService : IReadUserService
+internal sealed class ReadUserService : IReadUserService
 {
-    private readonly IReadUserRepository     _readUserRepo;
+    private readonly IReadUserRepository _readUserRepo;
     private readonly IReadUserActivityRepository _activityRepo;
-    private readonly ICurrentUserService     _currentUser;
-    private readonly ICacheService           _cache;
-    private readonly ILogger<RseadUserService> _logger;
-    private readonly IStringLocalizer<RseadUserService> _localizer;
+    private readonly ICurrentUserService _currentUser;
+    private readonly ICacheService _cache;
+    private readonly ILogger<ReadUserService> _logger;
+    private readonly IStringLocalizer<ReadUserService> _localizer;
 
-    public RseadUserService(
+    public ReadUserService(
         IReadUserRepository readUserRepo,
         IReadUserActivityRepository activityRepo,
         ICurrentUserService currentUser,
         ICacheService cache,
-        ILogger<RseadUserService> logger,
-        IStringLocalizer<RseadUserService> localizer)
+        ILogger<ReadUserService> logger,
+        IStringLocalizer<ReadUserService> localizer)
     {
         _readUserRepo = readUserRepo;
         _activityRepo = activityRepo;
-        _currentUser  = currentUser;
-        _cache        = cache;
-        _logger       = logger;
-        _localizer    = localizer;
+        _currentUser = currentUser;
+        _cache = cache;
+        _logger = logger;
+        _localizer = localizer;
     }
 
     // ── GetProfile ────────────────────────────────────────────────────────
@@ -68,8 +56,8 @@ internal sealed class RseadUserService : IReadUserService
 
             var result = user with
             {
-                TotalReviews    = stats.TotalReviews,
-                AverageRating   = stats.AverageRating,
+                TotalReviews = stats.TotalReviews,
+                AverageRating = stats.AverageRating,
                 ApprovedReviews = stats.ApprovedReviews,
                 RejectedReviews = stats.RejectedReviews
             };
@@ -103,8 +91,10 @@ internal sealed class RseadUserService : IReadUserService
             if (cached is not null)
                 return Result<PagedResult<UserListItemDto>>.Success(cached);
 
-            var spec  = new GetAllUsersSpecification(paging);
+            var spec = new GetAllUsersSpecification(paging);
+
             var items = await _readUserRepo.ProjectAsync(spec, GetUserProjection.UserListItem, ct);
+
             var total = await _readUserRepo.CountAsync(u => u.Role == Roles.User, ct);
 
             var response = PagedResult<UserListItemDto>.Create(items, total, paging.PageNumber, paging.PageSize);
@@ -127,8 +117,10 @@ internal sealed class RseadUserService : IReadUserService
     {
         try
         {
-            var spec  = new GetUserActivitiesSpecification(userId, paging);
+            var spec = new GetUserActivitiesSpecification(userId, paging);
+
             var items = await _activityRepo.ProjectAsync(spec, GetUserProjection.Activity, ct);
+
             var total = await _activityRepo.CountAsync(a => a.UserId == userId, ct);
 
             return Result<PagedResult<UserActivityDto>>.Success(

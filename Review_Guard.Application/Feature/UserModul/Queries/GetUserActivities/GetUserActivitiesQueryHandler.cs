@@ -1,9 +1,7 @@
 using MediatR;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.UserModul.Dto;
 using Review_Guard.Application.Feature.UserModul.UserService;
 
-namespace Review_Guard.Application.Feature.UserModul.Command.Query.GetUserActivities;
+namespace Review_Guard.Application.Feature.UserModul.Queries.GetUserActivities;
 
 internal sealed class GetUserActivitiesQueryHandler
     : IRequestHandler<GetUserActivitiesQuery, Result<PagedResult<UserActivityDto>>>
@@ -19,7 +17,7 @@ internal sealed class GetUserActivitiesQueryHandler
         var paging = new PaginationParams
         {
             PageNumber = request.PageNumber,
-            PageSize   = request.PageSize
+            PageSize = request.PageSize
         };
 
         return await _readUserService.GetUserActivitiesAsync(request.UserId, paging, cancellationToken);

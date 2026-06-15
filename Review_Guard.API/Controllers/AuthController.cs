@@ -70,7 +70,7 @@ public class AuthController : BaseController
     /// </summary>
     /// <param name="ct">Cancellation token</param>
     /// <returns>Logout result</returns>
-    [Authorize(Roles = "UserError,Admin,SuperAdmin")]
+    [Authorize(Roles = "User,BusinessOwner,Admin,SuperAdmin")]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(CancellationToken ct)
     {
@@ -87,7 +87,7 @@ public class AuthController : BaseController
     /// </summary>
     /// <param name="ct">Cancellation token</param>
     /// <returns>New JWT and refresh token</returns>
-    [Authorize(Roles = "UserError,Admin,SuperAdmin")]
+    [Authorize(Roles = "User,BusinessOwner,Admin,SuperAdmin")]
     [HttpGet("refresh-token")]
     public async Task<IActionResult> RefreshToken(CancellationToken ct)
     {

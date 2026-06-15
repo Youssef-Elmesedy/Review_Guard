@@ -1,9 +1,7 @@
 using MediatR;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.UserModul.Dto;
 using Review_Guard.Application.Feature.UserModul.UserService;
 
-namespace Review_Guard.Application.Feature.UserModul.Command.Query.GetAllUsers;
+namespace Review_Guard.Application.Feature.UserModul.Queries.GetAllUsers;
 
 internal sealed class GetAllUsersQueryHandler
     : IRequestHandler<GetAllUsersQuery, Result<PagedResult<UserListItemDto>>>
@@ -19,7 +17,7 @@ internal sealed class GetAllUsersQueryHandler
         var paging = new PaginationParams
         {
             PageNumber = request.PageNumber,
-            PageSize   = request.PageSize
+            PageSize = request.PageSize
         };
 
         return await _readUserService.GetAllUsersAsync(paging, cancellationToken);

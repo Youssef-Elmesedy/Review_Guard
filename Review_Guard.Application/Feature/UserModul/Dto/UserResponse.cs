@@ -5,6 +5,8 @@ namespace Review_Guard.Application.Feature.UserModul.Dto;
 public sealed record UserProfileResponse(
     Guid Id,
     string FullName,
+    string Descriiption,
+    string Phone,
     string Email,
     bool IsEmailVerified,
     string? ProfileImageUrl,
@@ -30,6 +32,8 @@ public sealed record UserReviewStats(
 public sealed record UserListItemDto(
     Guid Id,
     string FullName,
+    string Descriiption,
+    string Phone,
     string Email,
     string Role,
     string Status,
@@ -44,8 +48,8 @@ public sealed record UserListItemDto(
 
 public sealed record UpdateProfileRequest(
     string? FullName,
-    string? description,
-    string? phone
+    string? Descriiption,
+    string? Phone
 );
 
 // ── Change password request ──────────────────────────────
