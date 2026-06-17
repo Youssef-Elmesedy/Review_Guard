@@ -1,4 +1,4 @@
-<!-- 🌟 PROJECT BANNER -->
+<-- 🌟 PROJECT BANNER -->
 <p align="center">
   <img src="https://raw.githubusercontent.com/Youssef-Elmesedy/Review_Guard/main/the-doctor-shows-the-icon-of-the-protection-of-health.webp" alt="Review Guard Banner" width="100%" />
 </p>
@@ -10,6 +10,34 @@
   It ensures authentic user reviews by enforcing <b>proof of purchase</b>, <b>trust scoring</b>, and a <b>risk-based moderation system</b>.  
   Designed for scalability, security, and real-world marketplace reliability.
 </p>
+
+---
+
+<-- 🌟 HEADER BANNER -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Youssef-Elmesedy/Review_Guard/main/.github/images/banner.webp" width="100%" />
+</p>
+
+<h1 align="center">🛡️ Review Guard</h1>
+
+<p align="center">
+  <b>Enterprise-Grade Tamper-Resistant Review System</b><br/>
+  Built with <b>.NET 8</b>, <b>Clean Architecture</b>, and <b>DDD Lite</b><br/>
+  Designed to eliminate fake reviews using proof validation + trust scoring + risk engine
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-10.0-blueviolet" />
+  <img src="https://img.shields.io/badge/Architecture-Clean-0ea5e9" />
+  <img src="https://img.shields.io/badge/CQRS-MediatR-orange" />
+  <img src="https://img.shields.io/badge/Security-High-red" />
+</p>
+
+---
+
+# ⚡ SYSTEM OVERVIEW
+
+Client → API → Application → Domain ← Infrastructure
 
 <p align="center">
   <a href="https://github.com//Review_Guard/stargazers">
@@ -36,8 +64,11 @@
 The system is built using **Clean Architecture + DDD (Lite)** to ensure separation of concerns and scalability.
 📦 ReviewGuard
 ┣ 📂 API → Presentation Layer (Controllers, Middleware, Swagger)
+
 ┣ 📂 Application → CQRS, Commands, Queries, Validators, DTOs
+
 ┣ 📂 Domain → Core Business Logic (Entities, Rules, ValueObjects)
+
 ┣ 📂 Infrastructure → Data Access (EF Core, Repositories, External Services)
 
 ---
