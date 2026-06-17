@@ -27,6 +27,10 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
         builder.Property(b => b.AdminNote)
             .HasMaxLength(1000);
 
+        builder.HasIndex(x =>
+        new { x.OwnerId, x.NormalizedName })
+        .IsUnique().HasFilter("[NormalizedName] IS NOT NULL");
+
         // ── Relationships ───────────────────
 
         // Business → Owner (UserError)
@@ -49,6 +53,7 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
 
         // ── Indexes ─────────────────────────
         builder.HasIndex(b => b.OwnerId);
+        builder.HasIndex(b => b.NormalizedName);
         builder.HasIndex(b => b.BusinessCategoryId);
         builder.HasIndex(b => b.Status);
     }

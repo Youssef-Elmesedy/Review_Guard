@@ -18,6 +18,8 @@ public class Branch : BaseEntity
     public Guid ManagerId { get; private set; }
     public User Manager { get; private set; } = default!;
 
+    public bool IsManagedBy(Guid userId) => ManagerId == userId;
+
     // Navigation 
     private readonly List<Review> _reviews = new();
     public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();

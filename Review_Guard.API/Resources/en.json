@@ -1,6 +1,7 @@
 {
   "Auth": {
     "UserAlreadyExists": "A user with this email address already exists.",
+    "FullNameAlreadyTaken": "A user with this full name already exists.",
     "InvalidCredentials": "Invalid email or password.",
     "EmailNotVerified": "Please verify your email first.",
     "EmailAlreadyVerified": "Email is already verified.",
@@ -69,9 +70,13 @@
     "VerificationCodeType": "The Verification Code Type Is Required.",
     "VerificationCodeAlreadyUsed": "This verification code has already been used.",
     "MediaOwnership": "You do not have permission to access this media.",
-    "BranchNotFound": "Branch not found."
+    "BranchNotFound": "Branch not found.",
+    "UserCannotReviewOwnBusiness": "You cannot review your own business.",
+    "UserCannotReviewManagedBusiness": "You cannot review a business that you manage.",
+    "ProofNotVerified": "The provided proof has not been verified."
   },
   "Business": {
+    "NotActive": "The requested business is not active.",
     "NotFound": "The requested resource was not found.",
     "AlreadyExists": "The requested resource already exists.",
     "InvalidData": "The provided data is invalid.",
@@ -115,6 +120,7 @@
     "PasswordUpdateSuccess": "Password updated successfully."
   },
   "Review": {
+    "LoginFirst": "Please log in first.",
     "NotFound": "Review not found.",
     "AlreadyReviewed": "You have already submitted a review for this branch.",
     "CreateFailed": "Failed to submit review. Please try again.",

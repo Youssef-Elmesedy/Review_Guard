@@ -41,6 +41,7 @@ public sealed class MediaController : BaseController
     /// </summary>
     /// <param name="ownerType">Entity type (Business | Branch | UserError | Proof)</param>
     /// <param name="ownerId">Owner GUID</param>
+    /// <param name="ct">Cancellation token to cancel the request if needed.</param>
     [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<MediaAssetResponseDto>), StatusCodes.Status200OK)]

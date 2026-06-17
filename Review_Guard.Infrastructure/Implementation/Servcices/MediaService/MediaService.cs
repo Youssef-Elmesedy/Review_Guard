@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Review_Guard.Application.Abstractions.Repositories.MediaRepository;
 using Review_Guard.Application.Abstractions.Services.MediaService;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.MediaService;
 
@@ -28,7 +25,6 @@ internal sealed class MediaService : IMediaService
     {
         { MediaOwnerType.Business, "businesses" },
         { MediaOwnerType.Branch,   "branches"   },
-        { MediaOwnerType.User,     "users"       },
         { MediaOwnerType.Proof,    "proofs"      },
     };
 
@@ -88,16 +84,6 @@ internal sealed class MediaService : IMediaService
         var nextSortOrder = existing.Count > 0
             ? existing.Max(m => m.SortOrder) + 1
             : 0;
-
-        // For UserError profile: only 1 allowed, replace existing
-        if (ownerType == MediaOwnerType.User)
-        {
-            if (files.Count > 1)
-                return Result<IReadOnlyList<MediaUploadResultDto>>.Failure(
-                    AppErrorCodes.Media.ProfileImageSingleOnly);
-
-            await DeleteAllInternalAsync(existing, ct);
-        }
 
         try
         {

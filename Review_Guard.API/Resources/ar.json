@@ -1,6 +1,7 @@
 {
   "Auth": {
     "UserAlreadyExists": "يوجد مستخدم بهذا البريد الإلكتروني",
+    "FullNameAlreadyTaken": "يوجد مستخدم بهذا الاسم الكامل بالفعل.",
     "InvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "EmailNotVerified": "يجب تأكيد البريد الإلكتروني أولاً",
     "EmailAlreadyVerified": "تم التحقق من البريد الإلكتروني بالفعل.",
@@ -69,9 +70,11 @@
     "VerificationCodeType": "نوع رمز التحقق مطلوب.",
     "VerificationCodeAlreadyUsed": "تم استخدام رمز التحقق هذا بالفعل.",
     "MediaOwnership": "ليس لديك إذن للوصول إلى هذا الوسائط.",
-    "BranchNotFound": "لم يتم العثور على الفرع."
+    "BranchNotFound": "لم يتم العثور على الفرع.",
+    "ProofNotVerified": "هذا الإثبات لم يتم التحقق منه بعد."
   },
   "Business": {
+    "NotActive": "العمل التجاري المطلوب غير نشط.",
     "NotFound": "المورد المطلوب غير موجود.",
     "AlreadyExists": "المورد المطلوب موجود بالفعل.",
     "InvalidData": "البيانات المقدمة غير صالحة.",
@@ -112,9 +115,12 @@
     "FileTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به وهو {0} بايت.",
     "Norecentdataavailable": "There is no recent data to update.",
     "UpdateSuccess": "تم تحديث بيانات المستخدم بنجاح.",
-    "PasswordUpdateSuccess": "تم تحديث كلمة المرور بنجاح."
+    "PasswordUpdateSuccess": "تم تحديث كلمة المرور بنجاح.",
+    "UserCannotReviewOwnBusiness": "لا يمكنك تقييم عملك التجاري الخاص.",
+    "UserCannotReviewManagedBusiness": "لا يمكنك تقييم عمل تجاري تديره."
   },
   "Review": {
+    "LoginFirst": "يرجى تسجيل الدخول أولاً.",
     "NotFound": "لم يتم العثور على التقييم.",
     "AlreadyReviewed": "لقد قمت بالفعل بتقييم هذا الفرع.",
     "CreateFailed": "فشل تقديم التقييم. حاول مرة أخرى.",

@@ -21,10 +21,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash).IsRequired();
 
         builder.Property(u => u.TrustScoreValue)
-            .HasPrecision(5, 2).HasDefaultValue(80m);
+            .HasPrecision(5, 2);
 
         builder.Property(u => u.Status)
-            .HasDefaultValue(AccountStatus.PendingVerification)
             .HasConversion<string>();
 
         builder.Property(u => u.ProfileImageUrl).HasMaxLength(500);

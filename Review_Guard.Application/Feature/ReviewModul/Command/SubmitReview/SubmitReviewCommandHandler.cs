@@ -1,8 +1,8 @@
 using MediatR;
-using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Application.Feature.ReviewModul.Dto;
 using Review_Guard.Application.Feature.ReviewModul.Services;
 namespace Review_Guard.Application.Feature.ReviewModul.Command.SubmitReview;
+
 internal sealed class SubmitReviewCommandHandler : IRequestHandler<SubmitReviewCommand, Result<ReviewResponseDto>>
 {
     private readonly IWriteReviewService _service;

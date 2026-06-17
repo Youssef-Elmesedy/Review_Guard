@@ -1,23 +1,11 @@
-﻿using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Abstractions.Services.CurrentUserService;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.CommonMessages;
-using Review_Guard.Application.Common.ResultPattern;
-using Review_Guard.Application.Feature.Auth;
-using Review_Guard.Application.Feature.BusinessModul;
-using Review_Guard.Application.Feature.BusinessModul.Dto;
-using Review_Guard.Application.Feature.BusinessModul.Services;
-using Review_Guard.Domain.Exceptions;
-using Review_Guard.Domain.Rules;
-
-namespace Review_Guard.Infrastructure.Implementation.Servcices.BusinessService;
+﻿namespace Review_Guard.Infrastructure.Implementation.Servcices.BusinessService;
 
 internal sealed class WriteBusinessService : IWriteBusinessService
 {
     private readonly IReadBusinessRepository _readBusinessRepository;
     private readonly IWriteBusinessRepository _writeBusinessRepository;
     private readonly IReadBusinessCategoryRepository _categoryRepository;
-    private readonly IReadUserRepository _userRepository;
+    private readonly IReadUserService _userService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUser;
     private readonly INotificationService _notifications;
@@ -28,22 +16,14 @@ internal sealed class WriteBusinessService : IWriteBusinessService
     // Centralized cache-prefix invalidation for every list endpoint exposed by BusinessController
     private const string BusinessCachePrefix = "business:";
 
-    public WriteBusinessService(
-        IReadBusinessRepository readBusinessRepository,
-        IWriteBusinessRepository writeBusinessRepository,
-        IReadBusinessCategoryRepository categoryRepository,
-        IReadUserRepository userRepository,
-        IUnitOfWork unitOfWork,
-        ICurrentUserService currentUser,
-        INotificationService notifications,
-        ICacheService cache,
-        IStringLocalizer<WriteBusinessService> str,
-        ILogger<WriteBusinessService> logger)
+    public WriteBusinessService(IReadBusinessRepository readBusinessRepository, IWriteBusinessRepository writeBusinessRepository, IReadBusinessCategoryRepository categoryRepository, IReadUserService userService,
+        IUnitOfWork unitOfWork, ICurrentUserService currentUser, INotificationService notifications, ICacheService cache,
+        IStringLocalizer<WriteBusinessService> str, ILogger<WriteBusinessService> logger)
     {
         _readBusinessRepository = readBusinessRepository;
         _writeBusinessRepository = writeBusinessRepository;
         _categoryRepository = categoryRepository;
-        _userRepository = userRepository;
+        _userService = userService;
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _notifications = notifications;
@@ -63,20 +43,12 @@ internal sealed class WriteBusinessService : IWriteBusinessService
 
             var userId = _currentUser.UserId.Value;
 
-            var existingBusiness = await _readBusinessRepository.FindFirstAsync(b => b.OwnerId == userId, ct);
-            if (existingBusiness is not null)
-                return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
-                    Conflict(_stringLocalizer[BusinessMessage.CreatedBusinessExists, existingBusiness.Name, userId],
-                             _stringLocalizer[BusinessMessage.CreatedBusinessExists, existingBusiness.Name, userId]));
-
             // ── Load & validate owner ──────────────────────────────────────────
-            var user = await _userRepository.GetByIdAsync(userId, ct);
+            var user = await _userService.GetProfileAsync(userId, ct);
             if (user is null)
                 return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
                     NotFound(_stringLocalizer[AuthMessage.UserNotFound],
                             _stringLocalizer[AuthMessage.UserNotFound]));
-
-            UserBusinessRules.AccountMustBeActive(user);
 
             var nameExists = await _readBusinessRepository.NameExistsForOwnerAsync(userId, command.Name, ct);
             if (nameExists)
@@ -98,9 +70,23 @@ internal sealed class WriteBusinessService : IWriteBusinessService
                 command.Description,
                 command.BusinessCategoryId);
 
-            await _writeBusinessRepository.AddAsync(business, ct);
+            await _unitOfWork.ExecuteAsync(async () =>
+            {
+                await _writeBusinessRepository.AddAsync(business, ct);
 
-            await _unitOfWork.SaveChangesAsync(ct);
+                await _unitOfWork.SaveChangesAsync(ct);
+
+                await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
+
+
+            }, ct);
+
+            // 🔔 Notify all admins — new business pending approval
+            await _notifications.NotifyAllAdminsAsync(
+                NotificationType.NewBusinessPending,
+                "New business pending approval",
+                $"'{business.Name}' was submitted by {user.Value.FullName} and is awaiting review.",
+                business.Id.ToString(), "Business", ct);
 
             var response = new CreateBusinessResponse
             (
@@ -112,14 +98,6 @@ internal sealed class WriteBusinessService : IWriteBusinessService
                 business.Status.ToString()
             );
 
-            await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
-
-            // 🔔 Notify all admins — new business pending approval
-            await _notifications.NotifyAllAdminsAsync(
-                NotificationType.NewBusinessPending,
-                "New business pending approval",
-                $"'{business.Name}' was submitted by {user.FullName} and is awaiting review.",
-                business.Id.ToString(), "Business", ct);
 
             return Result<CreateBusinessResponse>.Success(response);
         }
@@ -137,7 +115,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
             _logger.LogError(ex, "An unexpected error occurred while creating business.");
             return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.Failure
                 (
-                  BusinessMessage.CreateBusinessFailed,
+                  ex.Message,
                   _stringLocalizer[BusinessMessage.CreateBusinessFailed]
                 ));
         }
@@ -157,15 +135,17 @@ internal sealed class WriteBusinessService : IWriteBusinessService
                 return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.
                     NotFound(BusinessMessage.BusinessNotFound, _stringLocalizer[BusinessMessage.BusinessNotFound]));
 
+
+
             business.UpdateInfo(_currentUser.UserId.Value, command.Name, command.Description);
 
-            await _writeBusinessRepository.UpdateAsync(business, ct);
-
-            await _unitOfWork.SaveChangesAsync(ct);
-
-            await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
-
-            await _cache.RemoveAsync($"business:{business.Id}", ct);
+            await _unitOfWork.ExecuteAsync(async () =>
+             {
+                 await _writeBusinessRepository.UpdateAsync(business, ct);
+                 await _unitOfWork.SaveChangesAsync(ct);
+                 //await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
+                 await _cache.RemoveAsync($"business:{business.Id}", ct);
+             }, ct);
 
             var response = new UpdateBusinessResponse(
                 business.Id,
@@ -186,7 +166,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         {
             _logger.LogError(ex, "Unexpected error updating business {BusinessId}", command.Id);
             return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.Failure(
-                BusinessMessage.BusinessUpdateFailed, _stringLocalizer[BusinessMessage.BusinessUpdateFailed]));
+                ex.Message, _stringLocalizer[BusinessMessage.BusinessUpdateFailed]));
         }
     }
 
@@ -212,11 +192,20 @@ internal sealed class WriteBusinessService : IWriteBusinessService
             // Soft delete: deactivate rather than hard-delete to preserve reviews/branches history
             business.Deactivate();
 
-            await _writeBusinessRepository.UpdateAsync(business, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
+            await _unitOfWork.ExecuteAsync(async () =>
+             {
+                 await _writeBusinessRepository.UpdateAsync(business, ct);
+                 await _unitOfWork.SaveChangesAsync(ct);
+                 //await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
+                 await _cache.RemoveAsync($"business:{business.Id}", ct);
 
-            await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
-            await _cache.RemoveAsync($"business:{business.Id}", ct);
+             }, ct);
+
+            await _notifications.NotifyAllAdminsAsync(
+                 NotificationType.BusinessDeleted,
+                 "Your business was deleted",
+                 $"'{business.Name}' was deleted and is no longer visible to the public.",
+                 business.Id.ToString(), "Business", ct);
 
             return Result<bool>.Success(true);
         }
@@ -224,7 +213,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         {
             _logger.LogError(ex, "Unexpected error deleting business {BusinessId}", businessId);
             return Result<bool>.Failure(AppErrorsCataloge.Failure(
-                BusinessMessage.BusinessDeleteFailed, _stringLocalizer[BusinessMessage.BusinessDeleteFailed]));
+                ex.Message, _stringLocalizer[BusinessMessage.BusinessDeleteFailed]));
         }
     }
 
@@ -245,18 +234,20 @@ internal sealed class WriteBusinessService : IWriteBusinessService
 
             business.Approve(_currentUser.AdminId.Value, note);
 
-            await _writeBusinessRepository.UpdateAsync(business, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
+            await _unitOfWork.ExecuteAsync(async () =>
+            {
+                await _writeBusinessRepository.UpdateAsync(business, ct);
+                await _unitOfWork.SaveChangesAsync(ct);
+                //await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
+                await _cache.RemoveAsync($"business:{business.Id}", ct);
 
-            await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
-            await _cache.RemoveAsync($"business:{business.Id}", ct);
+            }, ct);
 
-            // 🔔 Notify owner
             await _notifications.NotifyBusinessOwnerAsync(
                 business.OwnerId,
                 NotificationType.BusinessApproved,
                 "Your business was approved",
-                $"'{business.Name}' is now live and visible to users.",
+                $"'{business.Name}' was approved and is now visible to the public.",
                 business.Id.ToString(), "Business", ct);
 
             return Result.Success();
@@ -268,7 +259,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error approving business {BusinessId}", businessId);
-            return Result.Failure(AppErrorsCataloge.Failure(BusinessMessage.BusinessApproveFailed, _stringLocalizer[BusinessMessage.BusinessApproveFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(ex.Message, _stringLocalizer[BusinessMessage.BusinessApproveFailed]));
         }
     }
 
@@ -289,13 +280,15 @@ internal sealed class WriteBusinessService : IWriteBusinessService
 
             business.Reject(_currentUser.AdminId.Value, reason);
 
-            await _writeBusinessRepository.UpdateAsync(business, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
+            await _unitOfWork.ExecuteAsync(async () =>
+            {
+                await _writeBusinessRepository.UpdateAsync(business, ct);
+                await _unitOfWork.SaveChangesAsync(ct);
+                //await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
+                await _cache.RemoveAsync($"business:{business.Id}", ct);
 
-            await _cache.RemoveByPrefixAsync(BusinessCachePrefix, ct);
-            await _cache.RemoveAsync($"business:{business.Id}", ct);
+            }, ct);
 
-            // 🔔 Notify owner
             await _notifications.NotifyBusinessOwnerAsync(
                 business.OwnerId,
                 NotificationType.BusinessRejected,
@@ -312,7 +305,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting business {BusinessId}", businessId);
-            return Result.Failure(AppErrorsCataloge.Failure(BusinessMessage.BusinessRejectFailed, _stringLocalizer[BusinessMessage.BusinessRejectFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(ex.Message, _stringLocalizer[BusinessMessage.BusinessRejectFailed]));
         }
     }
 }

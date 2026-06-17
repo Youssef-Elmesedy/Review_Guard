@@ -10,6 +10,7 @@ public class User : BaseEntity
 {
     // ── Core Info ─────────────────────────────────────────────
     public string FullName { get; private set; } = string.Empty;
+    public string NormalizedFullName { get; private set; } = string.Empty;
     public string? Description { get; private set; }
     public string? Phone { get; private set; }
     public string Email { get; private set; } = string.Empty;
@@ -75,7 +76,8 @@ public class User : BaseEntity
         return new User
         {
             Id = Guid.NewGuid(),
-            FullName = fullName,
+            FullName = fullName.Trim(),
+            NormalizedFullName = fullName.Trim().ToUpperInvariant(),
             Email = email,
             PasswordHash = passwordHash,
             Role = role,
@@ -96,7 +98,8 @@ public class User : BaseEntity
         if (!string.IsNullOrWhiteSpace(fullName) &&
             !string.Equals(FullName, fullName, StringComparison.Ordinal))
         {
-            FullName = fullName;
+            FullName = fullName.Trim();
+            NormalizedFullName = fullName.Trim().ToUpperInvariant();
             changed = true;
         }
 
@@ -119,9 +122,6 @@ public class User : BaseEntity
 
         return changed;
     }
-    // ── Media ─────────────────────────────────────────
-    private readonly List<MediaAsset> _mediaAssets = new();
-    public IReadOnlyCollection<MediaAsset> MediaAssets => _mediaAssets.AsReadOnly();
 
     public void UpdateProfileImageUrl(string? url)
     {
@@ -252,6 +252,7 @@ public class User : BaseEntity
     public void IncreaseTrustScore(decimal amount)
     {
         TrustScoreValue = TrustScore.Increase(amount).Value;
+
         SetUpdatedAt();
     }
 
@@ -266,11 +267,6 @@ public class User : BaseEntity
     {
         EnsureCanLogin();
         ResetDailyReviewCountIfNeeded();
-
-        if (TrustScore.RequiresProof)
-            throw new DomainException(
-                $"{FullName} (TrustScore={TrustScoreValue}) requires proof to submit reviews.",
-                DomainMessagies.ProofRequired);
 
         if (ReviewsSubmittedToday >= maxReviewsPerDay)
             throw new DomainException(

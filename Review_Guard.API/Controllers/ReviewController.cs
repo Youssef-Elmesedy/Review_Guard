@@ -1,4 +1,3 @@
-using Review_Guard.Application.Abstractions.Services.CurrentUserService;
 using Review_Guard.Application.Feature.ReviewModul.Command.ApproveReview;
 using Review_Guard.Application.Feature.ReviewModul.Command.DeleteReview;
 using Review_Guard.Application.Feature.ReviewModul.Command.RejectReview;
@@ -68,7 +67,7 @@ public sealed class ReviewController : BaseController
     [HttpDelete("{reviewId:guid}")]
     public async Task<IActionResult> Delete(Guid reviewId, CancellationToken ct)
     {
-        var isAdmin  = _currentUser.IsAdmin;
+        var isAdmin = _currentUser.IsAdmin;
         var callerId = isAdmin ? _currentUser.AdminId!.Value : _currentUser.UserId!.Value;
         return HandleResult(await _mediator.Send(new DeleteReviewCommand(callerId, isAdmin, reviewId), ct));
     }

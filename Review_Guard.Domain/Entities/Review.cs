@@ -22,7 +22,7 @@ public class Review : BaseEntity
     public decimal OverallRating { get; private set; }
     public string Title { get; private set; } = default!;
     public string Content { get; private set; } = default!;
-    public ReviewStatus Status { get; private set; } = ReviewStatus.Pending;
+    public ReviewStatus Status { get; private set; }
 
     public string? AdminNote { get; private set; }
     public Guid? ReviewedByAdminId { get; private set; }
@@ -101,6 +101,12 @@ public class Review : BaseEntity
         decimal value)
     {
         return Math.Round((food + service + cleanliness + ambience + value) / 5.0m, 1);
+    }
+
+    public void MarkAsPending(ReviewStatus status)
+    {
+        Status = status;
+        SetUpdatedAt();
     }
 
     public void Approve(Guid adminId, string? note = null)

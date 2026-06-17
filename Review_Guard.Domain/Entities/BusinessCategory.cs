@@ -7,6 +7,7 @@ namespace Review_Guard.Domain.Entities;
 public class BusinessCategory : BaseEntity
 {
     public string Name { get; private set; } = string.Empty;
+    public string NormalizedName { get; private set; } = string.Empty;
     public CategoryStatus Status { get; private set; } = CategoryStatus.Pending;
 
     // Navigation property for related businesses (if needed)
@@ -21,6 +22,9 @@ public class BusinessCategory : BaseEntity
         return new BusinessCategory
         {
             Name = name.Trim(),
+            NormalizedName = string.IsNullOrWhiteSpace(name)
+            ? null!
+            : name.Trim().ToUpperInvariant(),
             Status = CategoryStatus.Pending,
         };
     }

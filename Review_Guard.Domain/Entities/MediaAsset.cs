@@ -17,9 +17,6 @@ public class MediaAsset : BaseEntity
     public Guid? BranchId { get; private set; }
     public Branch? Branch { get; private set; }
 
-    public Guid? UserId { get; private set; }
-    public User? User { get; private set; }
-
     public Guid? ProofId { get; private set; }
     public Proof? Proof { get; private set; }
 
@@ -34,7 +31,6 @@ public class MediaAsset : BaseEntity
     {
         MediaOwnerType.Business => BusinessId!.Value,
         MediaOwnerType.Branch => BranchId!.Value,
-        MediaOwnerType.User => UserId!.Value,
         MediaOwnerType.Proof => ProofId!.Value,
         _ => throw new InvalidOperationException("Unknown owner type")
     };
@@ -63,27 +59,16 @@ public class MediaAsset : BaseEntity
             IsPrimary = isPrimary
         };
 
-    public static MediaAsset CreateForUser(Guid userId, string url)
-        => new()
-        {
-            UserId = userId,
-            Url = url,
-            OwnerType = MediaOwnerType.User,
-            Type = MediaType.Business, // reuse, or add Profile type to MediaType
-            SortOrder = 0,
-            IsPrimary = true
-        };
-
     public static MediaAsset CreateForProof(Guid proofId, string url)
-        => new()
-        {
-            ProofId = proofId,
-            Url = url,
-            OwnerType = MediaOwnerType.Proof,
-            Type = MediaType.Business,
-            SortOrder = 0,
-            IsPrimary = false
-        };
+     => new()
+     {
+         ProofId = proofId,
+         Url = url,
+         OwnerType = MediaOwnerType.Proof,
+         Type = MediaType.Business,
+         SortOrder = 0,
+         IsPrimary = false
+     };
 
     // ── Generic factory driven by OwnerType ────────────────────────
     public static MediaAsset Create(
@@ -96,7 +81,6 @@ public class MediaAsset : BaseEntity
         {
             MediaOwnerType.Business => CreateForBusiness(ownerId, url, sortOrder, isPrimary),
             MediaOwnerType.Branch => CreateForBranch(ownerId, url, sortOrder, isPrimary),
-            MediaOwnerType.User => CreateForUser(ownerId, url),
             MediaOwnerType.Proof => CreateForProof(ownerId, url),
             _ => throw new DomainException("Unknown owner type", "Media.UnknownOwnerType")
         };

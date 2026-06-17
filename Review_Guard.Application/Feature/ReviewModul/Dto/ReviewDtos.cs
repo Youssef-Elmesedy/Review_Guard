@@ -3,6 +3,7 @@ using Review_Guard.Domain.Enums;
 namespace Review_Guard.Application.Feature.ReviewModul.Dto;
 
 public sealed record SubmitReviewRequest(
+    Guid businessId,
     Guid BranchId,
     decimal FoodRating,
     decimal ServiceRating,
@@ -10,7 +11,7 @@ public sealed record SubmitReviewRequest(
     decimal AmbienceRating,
     decimal ValueRating,
     string Content,
-    Guid? ProofId = null
+    Guid ProofId
 );
 
 public sealed record AdminReviewActionRequest(string? Note);

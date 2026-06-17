@@ -1,4 +1,5 @@
-﻿using Review_Guard.Domain.Enums;
+﻿using Review_Guard.Application.Abstractions.Services.MediaService;
+using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Application.Feature.BusinessModul.Dto;
 
@@ -94,10 +95,3 @@ public record ReviewDto(
 );
 
 public sealed record BusinessRatingDto(Guid BusinessId, decimal Avg, int Count);
-
-public record MediaAssetDto(
-    Guid Id,
-    string Url,
-    bool IsPrimary,
-    int SortOrder
-);

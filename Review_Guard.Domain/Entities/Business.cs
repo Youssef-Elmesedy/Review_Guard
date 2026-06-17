@@ -8,8 +8,9 @@ public class Business : BaseEntity
 {
     private Business() { }
 
-    public string Name { get; private set; } = default!;
-    public string Description { get; private set; } = default!;
+    public string Name { get; private set; } = null!;
+    public string NormalizedName { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
 
     public Guid OwnerId { get; private set; }
     public User Owner { get; private set; } = default!;
@@ -50,7 +51,13 @@ public class Business : BaseEntity
     {
         if (!IsOwnedBy(currentUserId)) throw new DomainException("Only owner can update business.", DomainMessagies.Unauthorized);
 
-        if (!string.IsNullOrWhiteSpace(name)) Name = name;
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            Name = name.Trim();
+            NormalizedName = string.IsNullOrWhiteSpace(name)
+            ? null!
+            : name.Trim().ToUpperInvariant();
+        }
         if (!string.IsNullOrWhiteSpace(description)) Description = description;
 
         SetUpdatedAt();
@@ -97,6 +104,9 @@ public class Business : BaseEntity
         {
             OwnerId = ownerId,
             Name = name.Trim(),
+            NormalizedName = string.IsNullOrWhiteSpace(name)
+            ? null!
+            : name.Trim().ToUpperInvariant(),
             Description = description.Trim(),
             BusinessCategoryId = categoryId,
             Status = BusinessStatus.PendingApproval,
@@ -133,14 +143,5 @@ public class Business : BaseEntity
         ReviewedAt = DateTime.UtcNow;
         AdminNote = reason;
         SetUpdatedAt();
-    }
-    public Proof AddOrderProof(Guid branchId, Guid userId, string orderId)
-    {
-        var branch = Branches.FirstOrDefault(b => b.Id == branchId)
-            ?? throw new DomainException("Branch not found.", DomainMessagies.BranchNotFound);
-
-        var proof = Proof.CreateFromOrder(userId, branchId, orderId);
-        _proofs.Add(proof);
-        return proof;
     }
 }

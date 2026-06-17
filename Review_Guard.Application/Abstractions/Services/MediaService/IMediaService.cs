@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Application.Abstractions.Services.MediaService;
@@ -52,9 +51,7 @@ public interface IMediaService
     /// List all media for an owner.
     /// </summary>
     Task<Result<IReadOnlyList<MediaAssetDto>>> GetAllAsync(
-        Guid ownerId,
-        MediaOwnerType ownerType,
-        CancellationToken ct = default);
+        Guid ownerId, MediaOwnerType ownerType, CancellationToken ct = default);
 
     /// <summary>
     /// Reorder media assets by providing ordered list of asset IDs.

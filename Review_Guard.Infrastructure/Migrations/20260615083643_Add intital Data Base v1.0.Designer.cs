@@ -12,8 +12,8 @@ using Review_Guard.Infrastructure.Presistence;
 namespace Review_Guard.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260607235814_Add Notification Entity")]
-    partial class AddNotificationEntity
+    [Migration("20260615083643_Add intital Data Base v1.0")]
+    partial class AddintitalDataBasev10
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,10 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NormalizedFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -165,6 +169,10 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -185,9 +193,15 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.HasIndex("BusinessCategoryId");
 
+                    b.HasIndex("NormalizedName");
+
                     b.HasIndex("OwnerId");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("OwnerId", "NormalizedName")
+                        .IsUnique()
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Businesses", (string)null);
                 });
@@ -206,6 +220,10 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -214,6 +232,10 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("BusinessCategories", (string)null);
                 });
@@ -256,17 +278,9 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProofId");
-
-                    b.HasIndex("UserId1");
 
                     b.HasIndex("BranchId", "IsPrimary")
                         .IsUnique()
@@ -281,12 +295,6 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.HasIndex("OwnerType", "BusinessId");
 
                     b.HasIndex("OwnerType", "ProofId");
-
-                    b.HasIndex("OwnerType", "UserId");
-
-                    b.HasIndex("UserId", "IsPrimary")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL AND [IsPrimary] = 1");
 
                     b.ToTable("MediaAssets", (string)null);
                 });
@@ -330,8 +338,9 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -613,6 +622,10 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -632,9 +645,17 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.Property<DateTime?>("LastReviewSubmittedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("NormalizedFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("ProfileImageUrl")
                         .HasMaxLength(500)
@@ -648,9 +669,7 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("PendingVerification");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SuspendedUntil")
                         .HasColumnType("datetime2");
@@ -663,10 +682,8 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TrustScoreValue")
-                        .ValueGeneratedOnAdd()
                         .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)")
-                        .HasDefaultValue(80m);
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -710,10 +727,6 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Metadata")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("SuspicionReason")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -730,6 +743,11 @@ namespace Review_Guard.Infrastructure.Migrations
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("_metadata")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Metadata");
 
                     b.HasKey("Id");
 
@@ -862,22 +880,11 @@ namespace Review_Guard.Infrastructure.Migrations
                         .HasForeignKey("ProofId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Review_Guard.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Review_Guard.Domain.Entities.User", null)
-                        .WithMany("MediaAssets")
-                        .HasForeignKey("UserId1");
-
                     b.Navigation("Branch");
 
                     b.Navigation("Business");
 
                     b.Navigation("Proof");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Review_Guard.Domain.Entities.Notification", b =>
@@ -1050,8 +1057,6 @@ namespace Review_Guard.Infrastructure.Migrations
                     b.Navigation("Activities");
 
                     b.Navigation("Businesses");
-
-                    b.Navigation("MediaAssets");
 
                     b.Navigation("Proofs");
 

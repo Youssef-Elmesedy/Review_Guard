@@ -8,9 +8,10 @@ public class Admin : BaseEntity
 {
     private Admin() { }
 
-    public string FullName { get; private set; } = default!;
-    public string Email { get; private set; } = default!;
-    public string PasswordHash { get; private set; } = default!;
+    public string FullName { get; private set; } = string.Empty;
+    public string NormalizedFullName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string PasswordHash { get; private set; } = string.Empty;
     public bool IsActive { get; private set; } = true;
     public Roles Role { get; private set; } = default!;
     public int TotalActionsPerformed { get; private set; }
@@ -25,6 +26,7 @@ public class Admin : BaseEntity
         return new Admin
         {
             FullName = fullName.Trim(),
+            NormalizedFullName = fullName.Trim().ToUpperInvariant(),
             Email = email.ToLowerInvariant().Trim(),
             PasswordHash = passwordHash,
             Role = role,

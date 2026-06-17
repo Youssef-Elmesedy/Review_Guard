@@ -5,6 +5,9 @@ public static class AuthMessage
     public const string UserAlreadyExists =
         "Auth.UserAlreadyExists";
 
+    public const string FullNameAlreadyTaken =
+        "Auth.FullNameAlreadyTaken";
+
     public const string InvalidCredentials =
         "Auth.InvalidCredentials";
 

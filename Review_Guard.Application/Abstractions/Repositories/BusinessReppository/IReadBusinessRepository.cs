@@ -10,9 +10,5 @@ public interface IReadBusinessRepository : IGenericReadRepository<Business>
     List<Guid> businessIds,
     CancellationToken ct);
 
-    Task<Dictionary<Guid, BusinessRatingDto>> GetBusinessRatingsByCategoryAsync(
-    Guid categoryId,
-    CancellationToken ct);
-
     Task<bool> NameExistsForOwnerAsync(Guid ownerId, string name, CancellationToken ct = default);
 }

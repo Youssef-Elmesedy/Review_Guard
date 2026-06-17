@@ -161,4 +161,10 @@ public static class DomainMessagies
 
     public const string VerificationCodeAlreadyUsed =
         "Validation.VerificationCodeAlreadyUsed";
+
+    public const string UserCannotReviewOwnBusiness =
+        "Validation.UserCannotReviewOwnBusiness";
+
+    public const string UserCannotReviewManagedBusiness =
+        "Validation.UserCannotReviewManagedBusiness";
 }

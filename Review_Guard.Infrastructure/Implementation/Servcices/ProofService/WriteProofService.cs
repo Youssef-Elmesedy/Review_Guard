@@ -1,25 +1,19 @@
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.CommonMessages;
-using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Application.Feature.ProofModul;
 using Review_Guard.Application.Feature.ProofModul.Dto;
 using Review_Guard.Application.Feature.ProofModul.Mapping;
 using Review_Guard.Application.Feature.ProofModul.Services;
 using Review_Guard.Application.Feature.ProofModul.Specification;
-using Review_Guard.Domain.Enums;
-using Review_Guard.Domain.Exceptions;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.ProofService;
 
 internal sealed class WriteProofService : IWriteProofService
 {
-    private readonly IReadProofRepository  _readRepo;
+    private readonly IReadProofRepository _readRepo;
     private readonly IWriteProofRepository _writeRepo;
     private readonly IReadBranchRepository _branchRepo;
-    private readonly INotificationService  _notifications;
-    private readonly IUnitOfWork           _uow;
-    private readonly ICacheService         _cache;
+    private readonly INotificationService _notifications;
+    private readonly IUnitOfWork _uow;
+    private readonly ICacheService _cache;
     private readonly ILogger<WriteProofService> _logger;
     private readonly IStringLocalizer<WriteProofService> _localizer;
 

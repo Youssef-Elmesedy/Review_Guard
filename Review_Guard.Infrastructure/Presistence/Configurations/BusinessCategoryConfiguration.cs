@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Review_Guard.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Review_Guard.Infrastructure.Presistence.Configurations;
 
@@ -18,6 +16,8 @@ public class BusinessCategoryConfiguration : IEntityTypeConfiguration<BusinessCa
 
         builder.Property(bc => bc.Status).HasConversion<string>()
             .IsRequired();
+
+        builder.HasIndex(bc => bc.NormalizedName).IsUnique().HasFilter("[NormalizedName] IS NOT NULL");
 
         builder.HasMany(bc => bc.Businesses)
             .WithOne(b => b.BusinessCategory)

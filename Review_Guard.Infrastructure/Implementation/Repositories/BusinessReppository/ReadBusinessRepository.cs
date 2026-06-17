@@ -1,6 +1,4 @@
-﻿using Review_Guard.Application.Feature.BusinessModul.Dto;
-
-namespace Review_Guard.Infrastructure.Implementation.Repositories.BusinessReppository;
+﻿namespace Review_Guard.Infrastructure.Implementation.Repositories.BusinessReppository;
 
 internal sealed class ReadBusinessRepository : GenericReadRepository<Business>, IReadBusinessRepository
 {
@@ -34,30 +32,17 @@ internal sealed class ReadBusinessRepository : GenericReadRepository<Business>, 
             .ToDictionaryAsync(x => x.BusinessId, ct);
     }
 
-    public async Task<Dictionary<Guid, BusinessRatingDto>> GetBusinessRatingsByCategoryAsync(
-        Guid categoryId,
-        CancellationToken ct)
-    {
-        return await _appDbContext.Branches
-            .Where(b => b.Business.BusinessCategoryId == categoryId)
-            .GroupBy(b => b.BusinessId)
-            .Select(g => new
-            {
-                BusinessId = g.Key,
-                Total = g.Sum(x => x.TotalReviews),
-                WeightedSum = g.Sum(x => x.WeightedAverageRating * x.TotalReviews)
-            })
-            .Select(x => new BusinessRatingDto(
-                x.BusinessId,
-                Math.Round(x.Total == 0 ? 0 : x.WeightedSum / x.Total, 2),
-                x.Total
-            ))
-            .ToDictionaryAsync(x => x.BusinessId, ct);
-    }
-
     public async Task<bool> NameExistsForOwnerAsync(
-      Guid ownerId, string name, CancellationToken ct = default)
-      => await _appDbContext.Set<Business>()
-          .AnyAsync(b => b.OwnerId == ownerId
-                      && b.Name == name.Trim(), ct);
+     Guid ownerId,
+     string name,
+     CancellationToken ct = default)
+    {
+        var normalizedName = name.Trim().ToUpperInvariant();
+
+        return await _appDbContext.Set<Business>()
+            .AnyAsync(
+                b => b.OwnerId == ownerId &&
+                     b.NormalizedName == normalizedName,
+                ct);
+    }
 }

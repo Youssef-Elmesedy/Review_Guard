@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Review_Guard.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IntitalDataBaseV : Migration
+    public partial class AddintitalDataBasev10 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,7 @@ namespace Review_Guard.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NormalizedFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -37,6 +38,7 @@ namespace Review_Guard.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NormalizedName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -52,14 +54,17 @@ namespace Review_Guard.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NormalizedFullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
                     IsEmailVerified = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "PendingVerification"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SuspensionReason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     SuspendedUntil = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TrustScoreValue = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false, defaultValue: 80m),
+                    TrustScoreValue = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
                     TotalReviewCount = table.Column<int>(type: "int", nullable: false),
                     ReviewsSubmittedToday = table.Column<int>(type: "int", nullable: false),
                     LastReviewSubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -81,6 +86,7 @@ namespace Review_Guard.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    NormalizedName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AdminNote = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
@@ -107,6 +113,41 @@ namespace Review_Guard.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AdminId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Target = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReferenceId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ReferenceType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Admins_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admins",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -257,37 +298,6 @@ namespace Review_Guard.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MediaAssets",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
-                    IsPrimary = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MediaAssets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MediaAssets_Branches_BranchId",
-                        column: x => x.BranchId,
-                        principalTable: "Branches",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MediaAssets_Businesses_BusinessId",
-                        column: x => x.BusinessId,
-                        principalTable: "Businesses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Proofs",
                 columns: table => new
                 {
@@ -325,6 +335,45 @@ namespace Review_Guard.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MediaAssets",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ProofId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OwnerType = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    IsPrimary = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MediaAssets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MediaAssets_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MediaAssets_Businesses_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Businesses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MediaAssets_Proofs_ProofId",
+                        column: x => x.ProofId,
+                        principalTable: "Proofs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -423,9 +472,21 @@ namespace Review_Guard.Infrastructure.Migrations
                 column: "ManagerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BusinessCategories_NormalizedName",
+                table: "BusinessCategories",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Businesses_BusinessCategoryId",
                 table: "Businesses",
                 column: "BusinessCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Businesses_NormalizedName",
+                table: "Businesses",
+                column: "NormalizedName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Businesses_OwnerId",
@@ -433,14 +494,16 @@ namespace Review_Guard.Infrastructure.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Businesses_OwnerId_NormalizedName",
+                table: "Businesses",
+                columns: new[] { "OwnerId", "NormalizedName" },
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Businesses_Status",
                 table: "Businesses",
                 column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MediaAssets_BranchId",
-                table: "MediaAssets",
-                column: "BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MediaAssets_BranchId_IsPrimary",
@@ -450,11 +513,6 @@ namespace Review_Guard.Infrastructure.Migrations
                 filter: "[BranchId] IS NOT NULL AND [IsPrimary] = 1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaAssets_BusinessId",
-                table: "MediaAssets",
-                column: "BusinessId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MediaAssets_BusinessId_IsPrimary",
                 table: "MediaAssets",
                 columns: new[] { "BusinessId", "IsPrimary" },
@@ -462,9 +520,39 @@ namespace Review_Guard.Infrastructure.Migrations
                 filter: "[BusinessId] IS NOT NULL AND [IsPrimary] = 1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaAssets_Type",
+                name: "IX_MediaAssets_OwnerType_BranchId",
                 table: "MediaAssets",
-                column: "Type");
+                columns: new[] { "OwnerType", "BranchId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MediaAssets_OwnerType_BusinessId",
+                table: "MediaAssets",
+                columns: new[] { "OwnerType", "BusinessId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MediaAssets_OwnerType_ProofId",
+                table: "MediaAssets",
+                columns: new[] { "OwnerType", "ProofId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MediaAssets_ProofId",
+                table: "MediaAssets",
+                column: "ProofId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_AdminId_IsRead_CreatedAt",
+                table: "Notifications",
+                columns: new[] { "AdminId", "IsRead", "CreatedAt" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_CreatedAt",
+                table: "Notifications",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_UserId_IsRead_CreatedAt",
+                table: "Notifications",
+                columns: new[] { "UserId", "IsRead", "CreatedAt" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Proofs_BranchId",
@@ -587,6 +675,9 @@ namespace Review_Guard.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "MediaAssets");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

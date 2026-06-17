@@ -1,4 +1,5 @@
-﻿using Review_Guard.Application.Feature.BusinessModul.Dto;
+﻿using Review_Guard.Application.Abstractions.Services.MediaService;
+using Review_Guard.Application.Feature.BusinessModul.Dto;
 using Review_Guard.Domain.Entities;
 using System.Linq.Expressions;
 
@@ -31,7 +32,8 @@ public static class BusinessProjections
                  x.Id,
                  x.Url,
                  x.IsPrimary,
-                 x.SortOrder
+                 x.SortOrder,
+                 x.CreatedAt
              )).ToList(),
 
          b.Branches.Select(br => new BranchListDto(
@@ -91,7 +93,8 @@ public static class BusinessProjections
                 x.Id,
                 x.Url,
                 x.IsPrimary,
-                x.SortOrder
+                x.SortOrder,
+                x.CreatedAt
             )).ToList(),
 
         b.Branches.SelectMany(br => br.Reviews.Select(r => new ReviewDto(
@@ -127,7 +130,8 @@ public static class BusinessProjections
              x.Id,
              x.Url,
              x.IsPrimary,
-             x.SortOrder
+             x.SortOrder,
+             x.CreatedAt
          )).ToList(),
 
       b.Reviews.Select(r => new ReviewDto(

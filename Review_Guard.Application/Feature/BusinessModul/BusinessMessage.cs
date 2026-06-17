@@ -2,6 +2,7 @@ namespace Review_Guard.Application.Feature.BusinessModul;
 
 public static class BusinessMessage
 {
+    public const string BusinessNotActive = "Business.NotActive";
     public const string BusinessNotFound = "Business.NotFound";
 
     public const string BusinessAlreadyExists = "Business.AlreadyExists";

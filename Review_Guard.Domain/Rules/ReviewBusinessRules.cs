@@ -1,18 +1,22 @@
 ﻿using Review_Guard.Domain.Entities;
 using Review_Guard.Domain.Enums;
 using Review_Guard.Domain.Exceptions;
-using Review_Guard.Domain.ValueObject;
 
 namespace Review_Guard.Domain.Rules;
 
 public static class ReviewBusinessRules
 {
-    public static void UserCannotReviewOwnBusiness(User user, Business business)
+    public static void UserCannotReviewOwnBusiness(User user, Branch branch)
     {
-        if (business.IsOwnedBy(user.Id))
+        if (branch.Business.IsOwnedBy(user.Id))
             throw new DomainException(
                 "You cannot review your own business.",
-                DomainMessagies.Unauthorized);
+                DomainMessagies.UserCannotReviewOwnBusiness);
+
+        if (branch.IsManagedBy(user.Id))
+            throw new DomainException(
+                "You cannot review a business you manage.",
+                DomainMessagies.UserCannotReviewManagedBusiness);
     }
 
     public static void UserMustBeEligibleToReview(User user, int maxPerDay = 5)
@@ -36,9 +40,9 @@ public static class ReviewBusinessRules
                 DomainMessagies.Unauthorized);
     }
 
-    public static void ProofMustMatchBusiness(Proof proof, Guid businessId)
+    public static void ProofMustMatchBusiness(Proof proof, Guid branchid)
     {
-        if (proof.BranchId != businessId)
+        if (proof.BranchId != branchid)
             throw new DomainException(
                 "The provided proof does not match this business.",
                 DomainMessagies.ProofBusinessMismatch);
@@ -46,10 +50,10 @@ public static class ReviewBusinessRules
 
     public static void ProofMustBeVerified(Proof proof)
     {
-        if (!proof.VerifiedByAdminId.HasValue)
-            throw new DomainException(
-                "Your proof of purchase must be verified before submitting a review.",
-                DomainMessagies.ProofNotVerified);
+        //if (!proof.VerifiedByAdminId.HasValue)
+        //    throw new DomainException(
+        //        "Your proof of purchase must be verified before submitting a review.",
+        //        DomainMessagies.ProofNotVerified);
     }
 
     public static void ProofRequiredForUserLevel(User user, Proof? proof)
@@ -65,15 +69,16 @@ public static class ReviewBusinessRules
         ProofMustBeVerified(proof);
     }
 
-    public static bool RequiresAdminApproval(User user, decimal riskScoreValue)
+    public static ReviewStatus DetermineReviewStatus(User user, Proof? proof)
     {
-        return user.Level switch
+        if (user.Level == UserLevel.Trusted &&
+            proof is not null &&
+            proof.Status == ProofStatus.Verified)
         {
-            UserLevel.LowTrust => true,
-            UserLevel.Normal => riskScoreValue >= RiskScore.LowRiskThreshold,
-            UserLevel.Trusted => riskScoreValue >= RiskScore.HighRiskThreshold,
-            _ => true
-        };
+            return ReviewStatus.Approved; // auto approve
+        }
+
+        return ReviewStatus.Pending; // admin review
     }
 
     public static void ValidateRating(int rating)

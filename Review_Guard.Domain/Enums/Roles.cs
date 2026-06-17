@@ -165,8 +165,7 @@ public enum MediaOwnerType
 {
     Business = 1,
     Branch = 2,
-    User = 3,
-    Proof = 4
+    Proof = 3
 }
 public enum NotificationType
 {
@@ -189,6 +188,7 @@ public enum NotificationType
     BusinessRejected = 21,
     NewReviewOnBranch = 22,
     ReportOnReview = 23,
+    BusinessDeleted = 24,
 
     // ── Admin ─────────────────────────────────
     NewUserRegistered = 40,

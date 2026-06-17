@@ -32,13 +32,6 @@ public class MediaAssetConfiguration : IEntityTypeConfiguration<MediaAsset>
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-        // ── UserError Relation ───────────────────────────────────────────
-        builder.HasOne(x => x.User)
-            .WithMany()
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false);
-
         // ── Proof Relation ──────────────────────────────────────────
         builder.HasOne(x => x.Proof)
             .WithMany()
@@ -49,7 +42,6 @@ public class MediaAssetConfiguration : IEntityTypeConfiguration<MediaAsset>
         // ── Indexes ─────────────────────────────────────────────────
         builder.HasIndex(x => new { x.OwnerType, x.BusinessId });
         builder.HasIndex(x => new { x.OwnerType, x.BranchId });
-        builder.HasIndex(x => new { x.OwnerType, x.UserId });
         builder.HasIndex(x => new { x.OwnerType, x.ProofId });
 
         // Unique: one primary per owner (per type)
@@ -59,10 +51,6 @@ public class MediaAssetConfiguration : IEntityTypeConfiguration<MediaAsset>
 
         builder.HasIndex(x => new { x.BranchId, x.IsPrimary })
             .HasFilter("[BranchId] IS NOT NULL AND [IsPrimary] = 1")
-            .IsUnique();
-
-        builder.HasIndex(x => new { x.UserId, x.IsPrimary })
-            .HasFilter("[UserId] IS NOT NULL AND [IsPrimary] = 1")
             .IsUnique();
     }
 }

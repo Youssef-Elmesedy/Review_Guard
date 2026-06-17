@@ -1,4 +1,3 @@
-using Review_Guard.Application.Common.CommonMessages;
 using Review_Guard.Application.Feature.Auth.DTOs.Requests;
 using Review_Guard.Application.Feature.Auth.DTOs.Responses;
 using System.Security;
@@ -54,73 +53,96 @@ internal sealed class AuthService : IAuthService
 
 
     // ─────────────────────────────────────────────────────────
-    // Register UserError
+    // Register User
     // ─────────────────────────────────────────────────────────
     public async Task<Result<AuthResponseDto>> RegisterUserAsync(
     RegisterUserDto request,
     CancellationToken ct)
     {
-        var exists = await _readUser.AnyAsync(x => x.Email == request.Email, ct);
-
-        if (exists)
-            return Result<AuthResponseDto>.Failure(AppErrorsCataloge.Conflict(
-                "A user with the given email already exists.",
-                _stringLocalizer[AuthMessage.UserAlreadyExists]));
-
-        var passwordHash = _passwordHasher.HashPassword(request.Password);
-
-        var user = User.Create(request.FullName, request.Email, passwordHash);
-
-        var VeificationCode = VerificationCode.Create(
-            user.Id,
-            VerificationCodeType.EmailVerification,
-            15);
-
-        var location = await _geoLocationService
-            .GetLocationAsync(_currentUser.IpAddress, ct);
-
-        var userActivity = await LogUserActivityAsync(
-                            user.Id,
-                            _currentUser.AdminId,
-                            ActivityType.Register,
-                            "Registered UserError",
-                            ct);
-
-        user.RaiseRegisteredEvent(VeificationCode.Code);
-
-        await _unitOfWork.ExecuteAsync(async () =>
+        try
         {
-            await _writeUser.AddAsync(user, ct);
-            await _WrietVerifiedToken.AddAsync(VeificationCode, ct);
-            await _writeUserActivity.AddAsync(userActivity, ct);
+            var normalizedFullName = request.FullName.Trim().ToUpperInvariant();
+            if (string.IsNullOrWhiteSpace(normalizedFullName) || await _readUser.AnyAsync(x => x.NormalizedFullName == normalizedFullName, ct))
+                return Result<AuthResponseDto>.Failure(AppErrorsCataloge.Conflict(
+                    "Full name is already taken.",
+                    _stringLocalizer[AuthMessage.FullNameAlreadyTaken]));
 
-        }, ct);
+            var exists = await _readUser.AnyAsync(x => x.Email == request.Email, ct);
 
-        // 🔔 Notify all admins about the new registration
-        await _notifications.NotifyAllAdminsAsync(
-            NotificationType.NewUserRegistered,
-            "New user registered",
-            $"{user.FullName} ({user.Email}) just joined the platform.",
-            user.Id.ToString(), "User", ct);
+            if (exists)
+                return Result<AuthResponseDto>.Failure(AppErrorsCataloge.Conflict(
+                    "A user with the given email already exists.",
+                    _stringLocalizer[AuthMessage.UserAlreadyExists]));
 
-        var accessToken = _jwtService.GenerateUserToken(user);
+            var passwordHash = _passwordHasher.HashPassword(request.Password);
 
-        var refreshToken = _refreshTokenService.Generate(
-            user.Id,
-            null,
-            userActivity.IpAddress);
+            var user = User.Create(request.FullName, request.Email, passwordHash);
 
-        return Result<AuthResponseDto>.Success(new AuthResponseDto(
-            accessToken,
-            refreshToken.Token,
-            refreshToken.ExpiresAtUtc,
-            user.Role.ToString(),
-            user.Id,
-            user.Email));
+            var VeificationCode = VerificationCode.Create(
+                user.Id,
+                VerificationCodeType.EmailVerification,
+                15);
+
+            var location = await _geoLocationService
+                .GetLocationAsync(_currentUser.IpAddress, ct);
+
+            var userActivity = await LogUserActivityAsync(
+                                user.Id,
+                                _currentUser.AdminId,
+                                ActivityType.Register,
+                                "Registered User",
+                                ct);
+
+            user.RaiseRegisteredEvent(VeificationCode.Code);
+
+            await _unitOfWork.ExecuteAsync(async () =>
+            {
+                await _writeUser.AddAsync(user, ct);
+                await _WrietVerifiedToken.AddAsync(VeificationCode, ct);
+                await _writeUserActivity.AddAsync(userActivity, ct);
+
+            }, ct);
+
+            // 🔔 Notify all admins about the new registration
+            await _notifications.NotifyAllAdminsAsync(
+                NotificationType.NewUserRegistered,
+                "New user registered",
+                $"{user.FullName} ({user.Email}) just joined the platform.",
+                user.Id.ToString(), "User", ct);
+
+            var accessToken = _jwtService.GenerateUserToken(user);
+
+            var refreshToken = _refreshTokenService.Generate(
+                user.Id,
+                null,
+                userActivity.IpAddress);
+
+            return Result<AuthResponseDto>.Success(new AuthResponseDto(
+                accessToken,
+                refreshToken.Token,
+                refreshToken.ExpiresAtUtc,
+                user.Role.ToString(),
+                user.Id,
+                user.Email));
+        }
+        catch (DomainException ex)
+        {
+            _logger.LogWarning("Registration failed: {Reason}", ex.Message);
+            return Result<AuthResponseDto>.Failure(
+                AppErrorsCataloge.Validation(
+                    ex.Message, _stringLocalizer[ex.MessageKey]));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Registration failed for user {Email}", request.Email);
+            return Result<AuthResponseDto>.Failure(
+                AppErrorsCataloge.Failure(
+                    ex.Message, _stringLocalizer[AuthMessage.RegisterationFailed]));
+        }
     }
 
     // ─────────────────────────────────────────────────────────
-    // Login UserError
+    // Login User
     // ─────────────────────────────────────────────────────────
     public async Task<Result<AuthResponseDto>> LoginUserAsync(
         LoginDto request,
@@ -128,7 +150,7 @@ internal sealed class AuthService : IAuthService
     {
         try
         {
-            _logger.LogInformation("Login attempt for UserError: {Email}", request.Email);
+            _logger.LogInformation("Login attempt for User {Email}", request.Email);
 
             var user = await _readUser.FindFirstAsync(
                 u => u.Email == request.Email, ct);
@@ -153,7 +175,7 @@ internal sealed class AuthService : IAuthService
                             user.Id,
                             _currentUser.AdminId,
                             ActivityType.Login,
-                            "Login UserError",
+                            "Login User",
                             ct);
 
             await _unitOfWork.ExecuteAsync(async () =>
@@ -168,7 +190,7 @@ internal sealed class AuthService : IAuthService
                 adminId: null,
                 ipAddress: _currentUser.IpAddress);
 
-            _logger.LogInformation("UserError {UserId} logged in successfully", user.Id);
+            _logger.LogInformation("User {UserId} logged in successfully", user.Id);
 
             return Result<AuthResponseDto>.Success(new AuthResponseDto(
                 accessToken,
@@ -192,7 +214,7 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    AuthMessage.LoginFailed, _stringLocalizer[AuthMessage.LoginFailed]));
+                    ex.Message, _stringLocalizer[AuthMessage.LoginFailed]));
         }
     }
 
@@ -261,7 +283,7 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    AuthMessage.LoginFailed, _stringLocalizer[AuthMessage.LoginFailed]));
+                    ex.Message, _stringLocalizer[AuthMessage.LoginFailed]));
         }
     }
 
@@ -328,14 +350,17 @@ internal sealed class AuthService : IAuthService
             }
             , ct);
 
-            _logger.LogInformation("UserError {UserId} logged out successfully", _currentUser.UserId);
+            _logger.LogInformation("User {UserId} logged out successfully", _currentUser.UserId);
 
             return Result<string>.Success(_stringLocalizer[AuthMessage.LogoutSuccessfully]);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Logout Filed");
-            throw;
+            _logger.LogError(ex, "Logout Failed");
+            return Result<string>.Failure(
+                AppErrorsCataloge.Failure(
+                    ex.Message,
+                    _stringLocalizer[AuthMessage.LogoutFailed]));
         }
     }
 
@@ -393,7 +418,7 @@ internal sealed class AuthService : IAuthService
             if (user is null && admin is null)
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.NotFound(
-                        "UserError or admin not found.",
+                        "User or admin not found.",
                         _stringLocalizer[CommonMessage.NotFound]));
 
             string accessToken;
@@ -426,7 +451,7 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    "Unexpected error occurred.",
+                    ex.Message,
                     _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
@@ -438,32 +463,43 @@ internal sealed class AuthService : IAuthService
     ForgotPasswordDto dto,
     CancellationToken ct)
     {
-        var user =
+        try
+        {
+            var user =
             await _readUser.FindFirstAsync(
                 x => x.Email == dto.Email,
                 ct);
 
-        if (user is null)
-        {
-            return Result<MessageResponseDto>.Success(new MessageResponseDto(
-                _stringLocalizer[AuthMessage.IfTheEmailExistsAResetCodeWasSent]));
-        }
+            if (user is null)
+            {
+                return Result<MessageResponseDto>.Success(new MessageResponseDto(
+                    _stringLocalizer[AuthMessage.IfTheEmailExistsAResetCodeWasSent]));
+            }
 
-        var verificationCode =
-            await _verificationTokenService.CreateOrRefreshAsync(
-                user.Id,
-                VerificationCodeType.PasswordReset,
-                15,
+            var verificationCode =
+                await _verificationTokenService.CreateOrRefreshAsync(
+                    user.Id,
+                    VerificationCodeType.PasswordReset,
+                    15,
+                    ct);
+
+            await _emailService.SendPasswordResetAsync(
+                user.Email,
+                user.FullName,
+                verificationCode.Code,
                 ct);
 
-        await _emailService.SendPasswordResetAsync(
-            user.Email,
-            user.FullName,
-            verificationCode.Code,
-            ct);
-
-        return Result<MessageResponseDto>.Success(new MessageResponseDto(
-            _stringLocalizer[AuthMessage.ResetPasswordCodeSentSuccessfully]));
+            return Result<MessageResponseDto>.Success(new MessageResponseDto(
+                _stringLocalizer[AuthMessage.ResetPasswordCodeSentSuccessfully]));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, "Forget Password Failed");
+            return Result<MessageResponseDto>.Failure(
+                AppErrorsCataloge.Failure(
+                    ex.Message,
+                    _stringLocalizer[CommonMessage.UnexpectedError]));
+        }
     }
 
     // ─────────────────────────────────────────────────────────
@@ -493,7 +529,10 @@ internal sealed class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Verification code validation failed");
-            throw;
+            return Result<string>.Failure(
+                AppErrorsCataloge.Failure(
+                    ex.Message,
+                    _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
 
@@ -504,39 +543,51 @@ internal sealed class AuthService : IAuthService
     ResetPasswordDto dto,
     CancellationToken ct)
     {
-        var (Code, user) = await ValidateVerificationCodeAsync(
+        try
+        {
+            var (Code, user) = await ValidateVerificationCodeAsync(
             dto.Code,
             VerificationCodeType.PasswordReset,
             ct);
 
 
-        if (dto.NewPassword != dto.ConfirmPassword)
-            return Result<MessageResponseDto>.Failure(
-                AppErrorsCataloge.Validation(
-                    "Passwords do not match.",
-                    _stringLocalizer[AuthMessage.PasswordsDoNotMatch]));
+            if (dto.NewPassword != dto.ConfirmPassword)
+                return Result<MessageResponseDto>.Failure(
+                    AppErrorsCataloge.Validation(
+                        "Passwords do not match.",
+                        _stringLocalizer[AuthMessage.PasswordsDoNotMatch]));
 
-        user.ChangePassword(
-            _passwordHasher.HashPassword(dto.NewPassword));
+            user.ChangePassword(
+                _passwordHasher.HashPassword(dto.NewPassword));
 
-        Code.MarkAsUsed();
+            Code.MarkAsUsed();
 
-        var activity = await LogUserActivityAsync(
-            user.Id,
-            _currentUser.AdminId,
-            ActivityType.PasswordChanged,
-            "Password reset successful",
-            ct);
+            var activity = await LogUserActivityAsync(
+                user.Id,
+                _currentUser.AdminId,
+                ActivityType.PasswordChanged,
+                "Password reset successful",
+                ct);
 
-        await _unitOfWork.ExecuteAsync(async () =>
+            await _unitOfWork.ExecuteAsync(async () =>
+            {
+                await _writeUser.UpdateAsync(user, ct);
+                await _WrietVerifiedToken.UpdateAsync(Code, ct);
+                await _writeUserActivity.AddAsync(activity, ct);
+            }, ct);
+
+            return Result<MessageResponseDto>.Success(
+                new MessageResponseDto(_stringLocalizer[AuthMessage.UpdatePasswordSuccessfully]));
+        }
+        catch (Exception ex)
         {
-            await _writeUser.UpdateAsync(user, ct);
-            await _WrietVerifiedToken.UpdateAsync(Code, ct);
-            await _writeUserActivity.AddAsync(activity, ct);
-        }, ct);
+            _logger.LogError(ex, $"Password reset failed for code: {dto.Code}");
+            return Result<MessageResponseDto>.Failure(
+                AppErrorsCataloge.Failure(
+                    ex.Message,
+                    _stringLocalizer[AuthMessage.PasswordResetFailed]));
+        }
 
-        return Result<MessageResponseDto>.Success(
-            new MessageResponseDto(_stringLocalizer[AuthMessage.UpdatePasswordSuccessfully]));
     }
 
     // ─────────────────────────────────────────────────────────
@@ -544,6 +595,7 @@ internal sealed class AuthService : IAuthService
     // ─────────────────────────────────────────────────────────
     public async Task VerifyEmailAsync(string code, CancellationToken ct)
     {
+        Guid userId = _currentUser.UserId ?? Guid.Empty; // Use Guid.Empty if UserId is null, will be handled in validation
         try
         {
             _logger.LogInformation("Email verification attempt");
@@ -571,10 +623,11 @@ internal sealed class AuthService : IAuthService
                 await _writeUserActivity.AddAsync(userActivity, ct);
             }, ct);
 
-            _logger.LogInformation("Email verified for UserError {UserId}", user.Id);
+            _logger.LogInformation("Email verified for User {UserId}", user.Id);
         }
-        catch (DomainException)
+        catch (DomainException ex)
         {
+            _logger.LogError(ex, "Email verification failed for User {UserId}", userId);
             throw;
         }
         catch (Exception ex)
@@ -592,11 +645,12 @@ internal sealed class AuthService : IAuthService
         try
         {
             _logger.LogInformation($"Resending Verification Code to {email}");
+
             var user = await _readUser.FindFirstAsync(e => e.Email.Equals(email), ct);
 
             if (user is null)
                 return Result<bool>.Failure(AppErrorsCataloge.NotFound(
-                    "UserError not found.",
+                    "User not found.",
                     _stringLocalizer[AuthMessage.UserNotFound]));
 
             if (!_passwordHasher.VerifyPassword(password, user.PasswordHash))
@@ -638,13 +692,13 @@ internal sealed class AuthService : IAuthService
                 email);
 
             return Result<bool>.Failure(AppErrorsCataloge.Failure(
-                "An unexpected error occurred. Please try again later.",
+                ex.Message,
                 _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
 
     // ─────────────────────────────────────────────────────────
-    // Login Log UserError Active 
+    // Login Log User Active 
     // ─────────────────────────────────────────────────────────
     private async Task<UserActivity> LogUserActivityAsync(
      Guid? userId,
@@ -708,7 +762,7 @@ internal sealed class AuthService : IAuthService
 
         if (user is null)
             throw new DomainException(
-                "UserError not found.",
+                "User not found.",
                 "NotFound");
 
         return (verificationcode, user);
