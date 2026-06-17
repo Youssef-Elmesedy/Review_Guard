@@ -142,4 +142,6 @@ Youssef Elmesedy
 
 This project is licensed under the MIT License.
 
-<p align="center"> ⭐ If you like this project, don't forget to star the repository! </p> ```
+<p align="center"> ⭐ If you like this project, don't forget to star the repository! </p>
+
+ ```
