@@ -6,21 +6,6 @@
 <h1 align="center">🛡️ Review Guard</h1>
 
 <p align="center">
-  A secure and tamper-resistant review platform built with <b>.NET 8</b> and <b>Clean Architecture</b>.  
-  It ensures authentic user reviews by enforcing <b>proof of purchase</b>, <b>trust scoring</b>, and a <b>risk-based moderation system</b>.  
-  Designed for scalability, security, and real-world marketplace reliability.
-</p>
-
----
-
-<-- 🌟 HEADER BANNER -->
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Youssef-Elmesedy/Review_Guard/main/.github/images/banner.webp" width="100%" />
-</p>
-
-<h1 align="center">🛡️ Review Guard</h1>
-
-<p align="center">
   <b>Enterprise-Grade Tamper-Resistant Review System</b><br/>
   Built with <b>.NET 8</b>, <b>Clean Architecture</b>, and <b>DDD Lite</b><br/>
   Designed to eliminate fake reviews using proof validation + trust scoring + risk engine
