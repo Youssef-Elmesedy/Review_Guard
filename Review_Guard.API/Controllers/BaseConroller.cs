@@ -35,7 +35,6 @@ public abstract class BaseController : ControllerBase
         return StatusCode(statusCode, new
         {
             success = false,
-            errorCode = error.Code,
             message = error.Message
         });
     }

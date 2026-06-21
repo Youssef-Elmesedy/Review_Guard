@@ -148,7 +148,7 @@ internal sealed class WriteReviewService : IWriteReviewService
         }
         catch (DomainException ex)
         {
-            _logger.LogWarning(ex, "Domain error submitting review for user {UserId}: {ErrorCode}", userId, ex.ErrorCode);
+            _logger.LogWarning(ex, "Domain error submitting review for user {UserId}", userId);
             return Fail<ReviewResponseDto>(ex.MessageKey);
         }
         catch (Exception ex)
@@ -171,25 +171,31 @@ internal sealed class WriteReviewService : IWriteReviewService
         {
             var review = await _readRepo.GetByIdAsync(reviewId, ct);
             if (review is null)
-                return Fail(ReviewMessage.NotFound);
+                return Result.Failure(AppErrorsCataloge
+                    .NotFound(_localizer[ReviewMessage.NotFound]));
 
             if (review.Status != ReviewStatus.Pending)
-                return Fail(ReviewMessage.AlreadyProcessed);
+                return Result.Failure(AppErrorsCataloge
+                    .Validation(_localizer[ReviewMessage.AlreadyProcessed]));
 
             var branch = await _branchRepo.GetByIdAsync(review.BranchId, ct);
             var user = await _readUserRepo.GetByIdAsync(review.UserId, ct);
 
             if (branch is null)
-                return Fail(DomainMessagies.BranchNotFound);
+                return Result.Failure(AppErrorsCataloge
+                    .NotFound(_localizer[DomainMessagies.BranchNotFound]));
 
             if (user is null)
-                return Fail(UserMessage.UserNotFound);
+                return Result.Failure(AppErrorsCataloge
+                    .NotFound(_localizer[UserMessage.UserNotFound]));
 
             await _unitofwork.ExecuteAsync(async () =>
             {
                 review.Approve(adminId, request.Note);
 
                 await _writeRepo.UpdateAsync(review, ct);
+
+                await _unitofwork.CommitTransactionAsync(ct); // error
 
                 branch.DecrementPendingReviews();
 
@@ -224,10 +230,17 @@ internal sealed class WriteReviewService : IWriteReviewService
 
             return Result.Success();
         }
+        catch (DomainException ex)
+        {
+            _logger.LogError(ex, "Approve review falied for Domain ex");
+            return Result.Failure(AppErrorsCataloge
+                .Validation(_localizer[ex.Message]));
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Approve review failed {ReviewId}", reviewId);
-            return Fail(ReviewMessage.ApproveFailed);
+            return Result.Failure(AppErrorsCataloge
+                .Failure(ex.Message));
         }
     }
 
@@ -297,13 +310,11 @@ internal sealed class WriteReviewService : IWriteReviewService
             if (review is null)
                 return Result.Failure(
                     AppErrorsCataloge.NotFound(
-                        ReviewMessage.NotFound,
                         _localizer[ReviewMessage.NotFound]));
 
             if (!isAdmin && review.UserId != callerId)
                 return Result.Failure(
                     AppErrorsCataloge.Forbidden(
-                        ReviewMessage.Forbidden,
                         _localizer[ReviewMessage.Forbidden]));
 
             await _unitofwork.ExecuteAsync(async () =>
@@ -323,7 +334,6 @@ internal sealed class WriteReviewService : IWriteReviewService
 
             return Result.Failure(
                 AppErrorsCataloge.Failure(
-                    ReviewMessage.DeleteFailed,
                     _localizer[ReviewMessage.DeleteFailed]));
         }
     }
@@ -337,9 +347,9 @@ internal sealed class WriteReviewService : IWriteReviewService
         IEnumerable<(decimal Rating, decimal TrustWeight)> approvedReviews,
         int pendingCount)
     {
-        branch.RecalculateRatings(approvedReviews, pendingCount);
-        user.IncreaseTrustScore(TrustScore.ApprovalBonus);
-        user.RecordReviewSubmission();
+        branch.RecalculateRatings(approvedReviews, pendingCount); // Update SimpleAverageRating and WeightedAverageRating for Branch
+        user.IncreaseTrustScore(TrustScore.ApprovalBonus); // Update TrustScore Value for User
+        user.RecordReviewSubmission(); // Update Data Time Last Review and Incrument +1 Review Number for User
     }
 
     // ─────────────────────────────────────────────────────────
@@ -387,8 +397,8 @@ internal sealed class WriteReviewService : IWriteReviewService
     // HELPERS
     // ─────────────────────────────────────────────────────────
     private Result<T> Fail<T>(string msg)
-        => Result<T>.Failure(AppErrorsCataloge.Failure(msg, _localizer[msg]));
+        => Result<T>.Failure(AppErrorsCataloge.Failure(_localizer[msg]));
 
     private Result Fail(string msg)
-        => Result.Failure(AppErrorsCataloge.Forbidden(msg, _localizer[msg]));
+        => Result.Failure(AppErrorsCataloge.Forbidden(_localizer[msg]));
 }

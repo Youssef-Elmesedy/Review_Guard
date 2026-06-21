@@ -4,7 +4,7 @@
     "FullNameAlreadyTaken": "A user with this full name already exists.",
     "InvalidCredentials": "Invalid email or password.",
     "EmailNotVerified": "Please verify your email first.",
-    "EmailAlreadyVerified": "Email is already verified.",
+    "EmailAlreadyVerified": "Email For {0} is already verified.",
     "RegisterationFailed": "Registration failed.",
     "LoginFailed": "Login failed. Please try again.",
     "LogoutSuccessfully": "Logout successful.",
@@ -57,7 +57,7 @@
     "BanReasonRequired": "Ban reason is required.",
     "AccountAlreadyBanned": "This account is already banned.",
     "AccountNotSuspended": "This account is not suspended.",
-    "AccountSuspended": "This account is suspended.",
+    "AccountSuspended": "This account is suspended for limet {0}.",
     "ActivityDescriptionRequired": "Activity description is required.",
     "SuspicionReasonRequired": "Suspicion reason is required.",
     "MetadataKeyRequired": "Metadata key is required.",
@@ -73,7 +73,8 @@
     "BranchNotFound": "Branch not found.",
     "UserCannotReviewOwnBusiness": "You cannot review your own business.",
     "UserCannotReviewManagedBusiness": "You cannot review a business that you manage.",
-    "ProofNotVerified": "The provided proof has not been verified."
+    "ProofNotVerified": "The provided proof has not been verified.",
+    "DailyReviewLimitExceeded": "You have reached the daily limit of {0} reviews."
   },
   "Business": {
     "NotActive": "The requested business is not active.",

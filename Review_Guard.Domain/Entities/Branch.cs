@@ -38,7 +38,7 @@ public class Branch : BaseEntity
     public void SetPrimaryImage(Guid mediaId)
     {
         var media = _media.FirstOrDefault(x => x.Id == mediaId)
-            ?? throw new DomainException("Image not found", DomainMessagies.ImageNotFound);
+            ?? throw new DomainException(DomainMessagies.ImageNotFound);
 
         foreach (var img in _media)
             img.UnsetPrimary();
@@ -58,8 +58,8 @@ public class Branch : BaseEntity
     // ── Factory ───────────────────────────────
     public static Branch Create(Guid businessId, string address, string city, string country, string phone, Guid managerId)
     {
-        if (string.IsNullOrWhiteSpace(address)) throw new DomainException("Branch.AddressRequired", DomainMessagies.AddressRequired);
-        if (string.IsNullOrWhiteSpace(phone)) throw new DomainException("Branch.PhoneRequired", DomainMessagies.PhoneRequired);
+        if (string.IsNullOrWhiteSpace(address)) throw new DomainException(DomainMessagies.AddressRequired);
+        if (string.IsNullOrWhiteSpace(phone)) throw new DomainException(DomainMessagies.PhoneRequired);
 
         return new Branch
         {
@@ -76,7 +76,7 @@ public class Branch : BaseEntity
     // ── Manager Actions ───────────────────────
     public void ChangeManager(Guid currentUserId, Guid ownerId, Guid newManagerId)
     {
-        if (currentUserId != ownerId) throw new DomainException("Only owner can change manager.", DomainMessagies.Unauthorized);
+        if (currentUserId != ownerId) throw new DomainException(DomainMessagies.Unauthorized);
         ManagerId = newManagerId;
         SetUpdatedAt();
     }
@@ -99,7 +99,7 @@ public class Branch : BaseEntity
             return;
         }
 
-        SimpleAverageRating = Math.Round(list.Average(r => (decimal)r.Rating), 2);
+        SimpleAverageRating = Math.Round(list.Average(r => r.Rating), 2);
 
         var totalWeight = list.Sum(r => r.TrustWeight);
 

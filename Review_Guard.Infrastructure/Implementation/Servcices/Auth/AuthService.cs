@@ -64,14 +64,12 @@ internal sealed class AuthService : IAuthService
             var normalizedFullName = request.FullName.Trim().ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(normalizedFullName) || await _readUser.AnyAsync(x => x.NormalizedFullName == normalizedFullName, ct))
                 return Result<AuthResponseDto>.Failure(AppErrorsCataloge.Conflict(
-                    "Full name is already taken.",
                     _stringLocalizer[AuthMessage.FullNameAlreadyTaken]));
 
             var exists = await _readUser.AnyAsync(x => x.Email == request.Email, ct);
 
             if (exists)
                 return Result<AuthResponseDto>.Failure(AppErrorsCataloge.Conflict(
-                    "A user with the given email already exists.",
                     _stringLocalizer[AuthMessage.UserAlreadyExists]));
 
             var passwordHash = _passwordHasher.HashPassword(request.Password);
@@ -129,15 +127,13 @@ internal sealed class AuthService : IAuthService
         {
             _logger.LogWarning("Registration failed: {Reason}", ex.Message);
             return Result<AuthResponseDto>.Failure(
-                AppErrorsCataloge.Validation(
-                    ex.Message, _stringLocalizer[ex.MessageKey]));
+                AppErrorsCataloge.Validation(_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Registration failed for user {Email}", request.Email);
             return Result<AuthResponseDto>.Failure(
-                AppErrorsCataloge.Failure(
-                    ex.Message, _stringLocalizer[AuthMessage.RegisterationFailed]));
+                AppErrorsCataloge.Failure(_stringLocalizer[AuthMessage.RegisterationFailed]));
         }
     }
 
@@ -161,7 +157,6 @@ internal sealed class AuthService : IAuthService
 
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid credentials.",
                         _stringLocalizer[AuthMessage.InvalidCredentials]));
             }
 
@@ -205,8 +200,7 @@ internal sealed class AuthService : IAuthService
             _logger.LogWarning("Login blocked for {Email}: {Reason}", request.Email, ex.Message);
 
             return Result<AuthResponseDto>.Failure(
-                AppErrorsCataloge.Validation(
-                    ex.Message, _stringLocalizer[ex.MessageKey]));
+                AppErrorsCataloge.Validation(_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
@@ -214,7 +208,7 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message, _stringLocalizer[AuthMessage.LoginFailed]));
+                    _stringLocalizer[AuthMessage.LoginFailed]));
         }
     }
 
@@ -236,7 +230,6 @@ internal sealed class AuthService : IAuthService
 
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid credentials.",
                         _stringLocalizer[AuthMessage.InvalidCredentials]));
             }
 
@@ -275,15 +268,14 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Validation(
-                    ex.Message, _stringLocalizer[ex.MessageKey]));
+                    _stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Login failed for admin {Email}", request.Email);
 
             return Result<AuthResponseDto>.Failure(
-                AppErrorsCataloge.Failure(
-                    ex.Message, _stringLocalizer[AuthMessage.LoginFailed]));
+                AppErrorsCataloge.Failure(_stringLocalizer[AuthMessage.LoginFailed]));
         }
     }
 
@@ -301,7 +293,6 @@ internal sealed class AuthService : IAuthService
             {
                 return Result<string>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
             }
 
@@ -310,7 +301,6 @@ internal sealed class AuthService : IAuthService
             if (token is null)
                 return Result<string>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
 
             try
@@ -321,14 +311,12 @@ internal sealed class AuthService : IAuthService
             {
                 return Result<string>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
             }
 
             if (!token.IsActive)
                 return Result<string>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Refresh token expired.",
                         _stringLocalizer[AuthMessage.RefreshTokenExpired]));
 
 
@@ -359,7 +347,6 @@ internal sealed class AuthService : IAuthService
             _logger.LogError(ex, "Logout Failed");
             return Result<string>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message,
                     _stringLocalizer[AuthMessage.LogoutFailed]));
         }
     }
@@ -376,7 +363,6 @@ internal sealed class AuthService : IAuthService
             if (string.IsNullOrWhiteSpace(tokenValue))
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
 
             var token = await _refreshTokenService.GetAsync(tokenValue, ct);
@@ -384,7 +370,6 @@ internal sealed class AuthService : IAuthService
             if (token is null)
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
 
             try
@@ -395,14 +380,12 @@ internal sealed class AuthService : IAuthService
             {
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Invalid refresh token.",
                         _stringLocalizer[AuthMessage.InvalidRefreshToken]));
             }
 
             if (token.IsExpired)
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.Unauthorized(
-                        "Refresh token expired.",
                         _stringLocalizer[AuthMessage.RefreshTokenExpired]));
 
             User? user = null;
@@ -418,7 +401,6 @@ internal sealed class AuthService : IAuthService
             if (user is null && admin is null)
                 return Result<AuthResponseDto>.Failure(
                     AppErrorsCataloge.NotFound(
-                        "User or admin not found.",
                         _stringLocalizer[CommonMessage.NotFound]));
 
             string accessToken;
@@ -451,7 +433,6 @@ internal sealed class AuthService : IAuthService
 
             return Result<AuthResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message,
                     _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
@@ -497,7 +478,6 @@ internal sealed class AuthService : IAuthService
             _logger.LogError(ex.Message, "Forget Password Failed");
             return Result<MessageResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message,
                     _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
@@ -523,7 +503,6 @@ internal sealed class AuthService : IAuthService
         {
             return Result<string>.Failure(
                 AppErrorsCataloge.Validation(
-                    ex.ErrorCode,
                     _stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
@@ -531,7 +510,6 @@ internal sealed class AuthService : IAuthService
             _logger.LogError(ex, "Verification code validation failed");
             return Result<string>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message,
                     _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
@@ -554,7 +532,6 @@ internal sealed class AuthService : IAuthService
             if (dto.NewPassword != dto.ConfirmPassword)
                 return Result<MessageResponseDto>.Failure(
                     AppErrorsCataloge.Validation(
-                        "Passwords do not match.",
                         _stringLocalizer[AuthMessage.PasswordsDoNotMatch]));
 
             user.ChangePassword(
@@ -584,7 +561,6 @@ internal sealed class AuthService : IAuthService
             _logger.LogError(ex, $"Password reset failed for code: {dto.Code}");
             return Result<MessageResponseDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.Message,
                     _stringLocalizer[AuthMessage.PasswordResetFailed]));
         }
 
@@ -650,18 +626,15 @@ internal sealed class AuthService : IAuthService
 
             if (user is null)
                 return Result<bool>.Failure(AppErrorsCataloge.NotFound(
-                    "User not found.",
                     _stringLocalizer[AuthMessage.UserNotFound]));
 
             if (!_passwordHasher.VerifyPassword(password, user.PasswordHash))
                 return Result<bool>.Failure(AppErrorsCataloge.Unauthorized(
-                    "Invalid credentials.",
                     _stringLocalizer[AuthMessage.InvalidCredentials]));
 
             if (user.IsEmailVerified)
             {
                 return Result<bool>.Failure(AppErrorsCataloge.Validation(
-                    "Email already verified.",
                     _stringLocalizer[AuthMessage.EmailAlreadyVerified]));
             }
 
@@ -692,7 +665,6 @@ internal sealed class AuthService : IAuthService
                 email);
 
             return Result<bool>.Failure(AppErrorsCataloge.Failure(
-                ex.Message,
                 _stringLocalizer[CommonMessage.UnexpectedError]));
         }
     }
@@ -742,17 +714,14 @@ internal sealed class AuthService : IAuthService
 
         if (verificationcode is null)
             throw new DomainException(
-                "Invalid verification code.",
                 DomainMessagies.InvalidVerificationCode);
 
         if (verificationcode.IsExpired)
             throw new DomainException(
-                "Verification Code has expired.",
                 DomainMessagies.VerificationCodeExpired);
 
         if (verificationcode.IsUsed)
             throw new DomainException(
-                "Code already used.",
                 DomainMessagies.VerificationCodeAlreadyUsed);
 
         var user =
@@ -762,7 +731,6 @@ internal sealed class AuthService : IAuthService
 
         if (user is null)
             throw new DomainException(
-                "User not found.",
                 "NotFound");
 
         return (verificationcode, user);

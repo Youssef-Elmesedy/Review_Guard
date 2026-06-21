@@ -82,7 +82,7 @@ public class MediaAsset : BaseEntity
             MediaOwnerType.Business => CreateForBusiness(ownerId, url, sortOrder, isPrimary),
             MediaOwnerType.Branch => CreateForBranch(ownerId, url, sortOrder, isPrimary),
             MediaOwnerType.Proof => CreateForProof(ownerId, url),
-            _ => throw new DomainException("Unknown owner type", "Media.UnknownOwnerType")
+            _ => throw new DomainException("Media.UnknownOwnerType")
         };
 
     // ── Domain Actions ─────────────────────────────────────────────

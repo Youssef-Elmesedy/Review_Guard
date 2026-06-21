@@ -45,7 +45,7 @@ internal sealed class WriteProofService : IWriteProofService
             var branch = await _branchRepo.GetByIdAsync(request.BranchId, ct);
             if (branch is null)
                 return Result<ProofResponseDto>.Failure(
-                    AppErrorsCataloge.NotFound(DomainMessagies.BranchNotFound, _localizer[DomainMessagies.BranchNotFound]));
+                    AppErrorsCataloge.NotFound(_localizer[DomainMessagies.BranchNotFound]));
 
             var proof = Proof.CreateFromFile(userId, request.BranchId, request.FileUrl);
             await _writeRepo.AddAsync(proof, ct);
@@ -63,13 +63,13 @@ internal sealed class WriteProofService : IWriteProofService
         }
         catch (DomainException ex)
         {
-            return Result<ProofResponseDto>.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result<ProofResponseDto>.Failure(AppErrorsCataloge.Failure(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error submitting proof by file for user {UserId}", userId);
             return Result<ProofResponseDto>.Failure(
-                AppErrorsCataloge.Failure(ProofMessage.CreateFailed, _localizer[ProofMessage.CreateFailed]));
+                AppErrorsCataloge.Failure(_localizer[ProofMessage.CreateFailed]));
         }
     }
 
@@ -81,7 +81,7 @@ internal sealed class WriteProofService : IWriteProofService
             var branch = await _branchRepo.GetByIdAsync(request.BranchId, ct);
             if (branch is null)
                 return Result<ProofResponseDto>.Failure(
-                    AppErrorsCataloge.NotFound(DomainMessagies.BranchNotFound, _localizer[DomainMessagies.BranchNotFound]));
+                    AppErrorsCataloge.NotFound(_localizer[DomainMessagies.BranchNotFound]));
 
             var proof = Proof.CreateFromOrder(userId, request.BranchId, request.OrderId);
             await _writeRepo.AddAsync(proof, ct);
@@ -99,13 +99,13 @@ internal sealed class WriteProofService : IWriteProofService
         }
         catch (DomainException ex)
         {
-            return Result<ProofResponseDto>.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result<ProofResponseDto>.Failure(AppErrorsCataloge.Failure(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error submitting proof by order for user {UserId}", userId);
             return Result<ProofResponseDto>.Failure(
-                AppErrorsCataloge.Failure(ProofMessage.CreateFailed, _localizer[ProofMessage.CreateFailed]));
+                AppErrorsCataloge.Failure(_localizer[ProofMessage.CreateFailed]));
         }
     }
 
@@ -116,7 +116,7 @@ internal sealed class WriteProofService : IWriteProofService
         {
             var proof = await _readRepo.GetByIdAsync(proofId, ct);
             if (proof is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(ProofMessage.NotFound, _localizer[ProofMessage.NotFound]));
+                return Result.Failure(AppErrorsCataloge.NotFound(_localizer[ProofMessage.NotFound]));
 
             proof.Verify(adminId, request.Note);
             await _writeRepo.UpdateAsync(proof, ct);
@@ -135,12 +135,12 @@ internal sealed class WriteProofService : IWriteProofService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Failure(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error verifying proof {ProofId}", proofId);
-            return Result.Failure(AppErrorsCataloge.Failure(ProofMessage.VerifyFailed, _localizer[ProofMessage.VerifyFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(_localizer[ProofMessage.VerifyFailed]));
         }
     }
 
@@ -151,7 +151,7 @@ internal sealed class WriteProofService : IWriteProofService
         {
             var proof = await _readRepo.GetByIdAsync(proofId, ct);
             if (proof is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(ProofMessage.NotFound, _localizer[ProofMessage.NotFound]));
+                return Result.Failure(AppErrorsCataloge.NotFound(_localizer[ProofMessage.NotFound]));
 
             var reason = request.Note ?? string.Empty;
             proof.Reject(adminId, reason);
@@ -171,12 +171,12 @@ internal sealed class WriteProofService : IWriteProofService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Failure(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting proof {ProofId}", proofId);
-            return Result.Failure(AppErrorsCataloge.Failure(ProofMessage.RejectFailed, _localizer[ProofMessage.RejectFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(_localizer[ProofMessage.RejectFailed]));
         }
     }
 }

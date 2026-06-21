@@ -1,12 +1,8 @@
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Application.Feature.ReportModul;
 using Review_Guard.Application.Feature.ReportModul.Dto;
 using Review_Guard.Application.Feature.ReportModul.Mapping;
 using Review_Guard.Application.Feature.ReportModul.Services;
 using Review_Guard.Application.Feature.ReportModul.Specification;
-using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.ReportService;
 
@@ -33,7 +29,7 @@ internal sealed class ReadReportService : IReadReportService
             var dto = await _repo.ProjectFirstOrDefaultAsync(new ReportByIdSpecification(reportId), ReportProjections.Full, ct);
             if (dto is null)
                 return Result<ReportResponseDto>.Failure(
-                    AppErrorsCataloge.NotFound(ReportMessage.NotFound, _localizer[ReportMessage.NotFound]));
+                    AppErrorsCataloge.NotFound(_localizer[ReportMessage.NotFound]));
 
             return Result<ReportResponseDto>.Success(dto);
         }
@@ -41,7 +37,7 @@ internal sealed class ReadReportService : IReadReportService
         {
             _logger.LogError(ex, "Error fetching report {ReportId}", reportId);
             return Result<ReportResponseDto>.Failure(
-                AppErrorsCataloge.Failure(ReportMessage.FetchFailed, _localizer[ReportMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReportMessage.FetchFailed]));
         }
     }
 
@@ -59,7 +55,7 @@ internal sealed class ReadReportService : IReadReportService
         {
             _logger.LogError(ex, "Error fetching all reports");
             return Result<PagedResult<ReportListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ReportMessage.FetchFailed, _localizer[ReportMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReportMessage.FetchFailed]));
         }
     }
 
@@ -77,7 +73,7 @@ internal sealed class ReadReportService : IReadReportService
         {
             _logger.LogError(ex, "Error fetching open reports");
             return Result<PagedResult<ReportListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ReportMessage.FetchFailed, _localizer[ReportMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReportMessage.FetchFailed]));
         }
     }
 }

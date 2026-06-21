@@ -68,11 +68,11 @@ public class User : BaseEntity
     public static User Create(string fullName, string email, string passwordHash, Roles role = Roles.User)
     {
         if (string.IsNullOrWhiteSpace(fullName))
-            throw new DomainException("Full Name is required.", DomainMessagies.FullNameRequired);
+            throw new DomainException(DomainMessagies.FullNameRequired);
         if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Email is required.", DomainMessagies.EmailRequired);
+            throw new DomainException(DomainMessagies.EmailRequired);
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException("Password hash is required.", DomainMessagies.PasswordRequired);
+            throw new DomainException(DomainMessagies.PasswordRequired);
         return new User
         {
             Id = Guid.NewGuid(),
@@ -142,7 +142,6 @@ public class User : BaseEntity
 
         if (string.IsNullOrWhiteSpace(newPasswordHash))
             throw new DomainException(
-                "New password hash is required.",
                 DomainMessagies.PasswordRequired);
 
         PasswordHash = newPasswordHash;
@@ -155,7 +154,6 @@ public class User : BaseEntity
     {
         if (IsEmailVerified)
             throw new DomainException(
-                $"Email for {FullName} is already verified.",
                 DomainMessagies.EmailAlreadyVerified);
 
         IsEmailVerified = true;
@@ -172,12 +170,10 @@ public class User : BaseEntity
     {
         if (IsBanned)
             throw new DomainException(
-                "Account is banned and cannot be suspended.",
                 DomainMessagies.AccountBanned);
 
         if (string.IsNullOrWhiteSpace(reason))
             throw new DomainException(
-                "Suspension reason is required.",
                 DomainMessagies.SuspensionReasonRequired);
 
         Status = AccountStatus.Suspended;
@@ -191,12 +187,10 @@ public class User : BaseEntity
     {
         if (IsBanned)
             throw new DomainException(
-                "Account is already banned.",
                 DomainMessagies.AccountAlreadyBanned);
 
         if (string.IsNullOrWhiteSpace(reason))
             throw new DomainException(
-                "Ban reason is required.",
                 DomainMessagies.BanReasonRequired);
 
         Status = AccountStatus.Banned;
@@ -210,7 +204,6 @@ public class User : BaseEntity
     {
         if (!IsSuspended)
             throw new DomainException(
-                "Account is not suspended.",
                 DomainMessagies.AccountNotSuspended);
 
         Status = AccountStatus.Active;
@@ -234,18 +227,14 @@ public class User : BaseEntity
 
         if (IsBanned)
             throw new DomainException(
-                "Account is banned.",
                 DomainMessagies.AccountBanned);
 
         if (IsSuspended)
             throw new DomainException(
-                $"Account is suspended until {SuspendedUntil?.ToShortDateString()}.",
                 DomainMessagies.AccountSuspended);
 
         if (Status == AccountStatus.PendingVerification)
-            throw new DomainException(
-                "Email not verified.",
-                DomainMessagies.EmailNotVerified);
+            throw new DomainException(DomainMessagies.EmailNotVerified);
     }
 
     // ── Trust Score Management ────────────────────────────
@@ -269,9 +258,7 @@ public class User : BaseEntity
         ResetDailyReviewCountIfNeeded();
 
         if (ReviewsSubmittedToday >= maxReviewsPerDay)
-            throw new DomainException(
-                $"You have reached the daily limit of {maxReviewsPerDay} reviews.",
-                DomainMessagies.DailyReviewLimitExceeded);
+            throw new DomainException(DomainMessagies.DailyReviewLimitExceeded);
     }
 
     public void RecordReviewSubmission()

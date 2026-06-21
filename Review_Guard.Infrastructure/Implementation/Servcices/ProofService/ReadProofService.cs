@@ -1,12 +1,8 @@
-using Microsoft.Extensions.Localization;
-using Review_Guard.Application.Common;
-using Review_Guard.Application.Common.ResultPattern;
 using Review_Guard.Application.Feature.ProofModul;
 using Review_Guard.Application.Feature.ProofModul.Dto;
 using Review_Guard.Application.Feature.ProofModul.Mapping;
 using Review_Guard.Application.Feature.ProofModul.Services;
 using Review_Guard.Application.Feature.ProofModul.Specification;
-using Review_Guard.Domain.Enums;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.ProofService;
 
@@ -40,7 +36,7 @@ internal sealed class ReadProofService : IReadProofService
             var dto = await _repo.ProjectFirstOrDefaultAsync(new ProofByIdSpecification(proofId), ProofProjections.Full, ct);
             if (dto is null)
                 return Result<ProofResponseDto>.Failure(
-                    AppErrorsCataloge.NotFound(ProofMessage.NotFound, _localizer[ProofMessage.NotFound]));
+                    AppErrorsCataloge.NotFound(_localizer[ProofMessage.NotFound]));
 
             await _cache.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(10), ct);
             return Result<ProofResponseDto>.Success(dto);
@@ -49,7 +45,7 @@ internal sealed class ReadProofService : IReadProofService
         {
             _logger.LogError(ex, "Error fetching proof {ProofId}", proofId);
             return Result<ProofResponseDto>.Failure(
-                AppErrorsCataloge.Failure(ProofMessage.FetchFailed, _localizer[ProofMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ProofMessage.FetchFailed]));
         }
     }
 
@@ -67,7 +63,7 @@ internal sealed class ReadProofService : IReadProofService
         {
             _logger.LogError(ex, "Error fetching proofs for user {UserId}", userId);
             return Result<PagedResult<ProofListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ProofMessage.FetchFailed, _localizer[ProofMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ProofMessage.FetchFailed]));
         }
     }
 
@@ -85,7 +81,7 @@ internal sealed class ReadProofService : IReadProofService
         {
             _logger.LogError(ex, "Error fetching pending proofs");
             return Result<PagedResult<ProofListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ProofMessage.FetchFailed, _localizer[ProofMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ProofMessage.FetchFailed]));
         }
     }
 }

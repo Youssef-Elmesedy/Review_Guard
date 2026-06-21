@@ -21,7 +21,7 @@ public class Admin : BaseEntity
     public static Admin Create(string fullName, string email,
         string passwordHash, Roles role)
     {
-        if (string.IsNullOrWhiteSpace(email)) throw new DomainException("Admin.EmailRequired", DomainMessagies.EmailRequired);
+        if (string.IsNullOrWhiteSpace(email)) throw new DomainException(DomainMessagies.EmailRequired);
 
         return new Admin
         {

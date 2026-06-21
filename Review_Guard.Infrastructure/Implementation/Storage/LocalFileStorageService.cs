@@ -75,13 +75,13 @@ public class LocalFileStorageService : IFileStorageService
 
         var normalized = contentType.ToLowerInvariant();
 
-        return _settings.AllowedTypes
+        return FileStorageSettingsTypes.AllowedTypes
             .Any(x => x.Equals(normalized, StringComparison.OrdinalIgnoreCase));
     }
 
     public bool IsAllowedFileSize(long fileSize)
     {
         return fileSize > 0 &&
-               fileSize <= _settings.MaxFileSizeBytes;
+               fileSize <= FileStorageSettingsTypes.MaxFileSizeBytes;
     }
 }

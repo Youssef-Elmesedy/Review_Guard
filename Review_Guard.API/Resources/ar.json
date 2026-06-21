@@ -4,7 +4,7 @@
     "FullNameAlreadyTaken": "يوجد مستخدم بهذا الاسم الكامل بالفعل.",
     "InvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
     "EmailNotVerified": "يجب تأكيد البريد الإلكتروني أولاً",
-    "EmailAlreadyVerified": "تم التحقق من البريد الإلكتروني بالفعل.",
+    "EmailAlreadyVerified": "تم التحقق من البريد الخاص ب {0} الإلكتروني بالفعل.",
     "RegisterationFailed": "فشل إنشاء الحساب",
     "LoginFailed": "فشل تسجيل الدخول",
     "AdminLoginFailed": "فشل تسجيل دخول المشرف",
@@ -57,7 +57,7 @@
     "BanReasonRequired": "سبب الحظر مطلوب.",
     "AccountAlreadyBanned": "تم حظر هذا الحساب بالفعل.",
     "AccountNotSuspended": "هذا الحساب غير معلق.",
-    "AccountSuspended": "هذا الحساب معلق.",
+    "AccountSuspended": "هذا الحساب معلق لمدة : {0} حتي يتم تخطي الوقت.",
     "ActivityDescriptionRequired": "وصف النشاط مطلوب",
     "SuspicionReasonRequired": "سبب الاشتباه مطلوب",
     "MetadataKeyRequired": "مفتاح البيانات الإضافية مطلوب",
@@ -71,7 +71,8 @@
     "VerificationCodeAlreadyUsed": "تم استخدام رمز التحقق هذا بالفعل.",
     "MediaOwnership": "ليس لديك إذن للوصول إلى هذا الوسائط.",
     "BranchNotFound": "لم يتم العثور على الفرع.",
-    "ProofNotVerified": "هذا الإثبات لم يتم التحقق منه بعد."
+    "ProofNotVerified": "هذا الإثبات لم يتم التحقق منه بعد.",
+    "DailyReviewLimitExceeded": "لقد تخطيت الحد الاقصي من عمل ريفيوهات {0} اليوم "
   },
   "Business": {
     "NotActive": "العمل التجاري المطلوب غير نشط.",

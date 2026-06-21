@@ -29,9 +29,7 @@ public class UserActivity : BaseEntity
         string? ipAddress = null, string? userAgent = null, string? location = null)
     {
         if (string.IsNullOrWhiteSpace(description))
-            throw new DomainException(
-                "Activity description is required.",
-                DomainMessagies.ActivityDescriptionRequired);
+            throw new DomainException(DomainMessagies.ActivityDescriptionRequired);
 
         return new UserActivity
         {
@@ -48,9 +46,7 @@ public class UserActivity : BaseEntity
     public void MarkSuspicious(string reason)
     {
         if (string.IsNullOrWhiteSpace(reason))
-            throw new DomainException(
-                "Suspicion reason is required.",
-                DomainMessagies.SuspicionReasonRequired);
+            throw new DomainException(DomainMessagies.SuspicionReasonRequired);
 
         IsSuspicious = true;
         SuspicionReason = reason;
@@ -59,9 +55,7 @@ public class UserActivity : BaseEntity
     public void AddMetadata(string key, string value)
     {
         if (string.IsNullOrWhiteSpace(key))
-            throw new DomainException(
-                "Metadata key is required.",
-                DomainMessagies.MetadataKeyRequired);
+            throw new DomainException(DomainMessagies.MetadataKeyRequired);
 
         _metadata[key] = value;
     }

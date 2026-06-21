@@ -52,16 +52,13 @@ public class Review : BaseEntity
         ValidateRating(valueRating);
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new DomainException("Title is required.",
-                DomainMessagies.TitleIsRequired);
+            throw new DomainException(DomainMessagies.TitleIsRequired);
 
         if (string.IsNullOrWhiteSpace(content))
-            throw new DomainException("Content is required.",
-                DomainMessagies.ContentIsRequired);
+            throw new DomainException(DomainMessagies.ContentIsRequired);
 
         if (content.Length < 20)
-            throw new DomainException("Content must be at least 20 characters.",
-                DomainMessagies.ContentIsRequiredLessThan20);
+            throw new DomainException(DomainMessagies.ContentIsRequiredLessThan20);
 
         var overall = CalculateOverall(
             foodRating,
@@ -89,8 +86,7 @@ public class Review : BaseEntity
     private static void ValidateRating(decimal rating)
     {
         if (rating < 1 || rating > 5)
-            throw new DomainException("Rating must be between 1 and 5.",
-                DomainMessagies.InvalidRatingValue);
+            throw new DomainException(DomainMessagies.InvalidRatingValue);
     }
 
     private static decimal CalculateOverall(

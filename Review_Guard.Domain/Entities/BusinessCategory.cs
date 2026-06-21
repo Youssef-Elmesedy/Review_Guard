@@ -17,7 +17,7 @@ public class BusinessCategory : BaseEntity
     public static BusinessCategory Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Category name is required.", DomainMessagies.FullNameRequired);
+            throw new DomainException(DomainMessagies.FullNameRequired);
 
         return new BusinessCategory
         {

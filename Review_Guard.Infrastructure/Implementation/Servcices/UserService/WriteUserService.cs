@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Review_Guard.Domain.Rules;
 
 namespace Review_Guard.Infrastructure.Implementation.Servcices.UserService;
 
@@ -50,25 +49,21 @@ internal sealed class WriteUserService : IWriteUserService
             if (user is null)
                 return Result<FileUploadResult?>.Failure(
                     AppErrorsCataloge.NotFound(
-                        _localizer[UserMessage.UserNotFound],
                         _localizer[UserMessage.UserNotFound]));
 
             if (user.Status == AccountStatus.PendingVerification)
                 return Result<FileUploadResult?>.Failure(
                     AppErrorsCataloge.Validation(
-                        _localizer[AuthMessage.AccountInactive],
                         _localizer[AuthMessage.AccountInactive]));
 
             if (!_fileStorge.IsAllowedContentType(fileImage.ContentType))
                 return Result<FileUploadResult?>.Failure(
                     AppErrorsCataloge.Validation(
-                        _localizer[UserMessage.UserUpdateError],
                         _localizer[UserMessage.InvalidFileType, string.Join(", ", FileStorageSettingsTypes.AllowedTypes)]));
 
             if (!_fileStorge.IsAllowedFileSize(fileImage.Length))
                 return Result<FileUploadResult?>.Failure(
                     AppErrorsCataloge.Validation(
-                        _localizer[UserMessage.UserUpdateError],
                         _localizer[UserMessage.FileTooLarge, FileStorageSettingsTypes.MaxFileSizeBytes]));
 
             string? oldImageUrl = user.ProfileImageUrl;
@@ -87,7 +82,6 @@ internal sealed class WriteUserService : IWriteUserService
             {
                 return Result<FileUploadResult?>.Failure(
                     AppErrorsCataloge.Failure(
-                        UserMessage.UserUpdateError,
                         uploadResult.Error ?? _localizer[UserMessage.UserUpdateError]));
             }
 
@@ -136,7 +130,6 @@ internal sealed class WriteUserService : IWriteUserService
         {
             return Result<FileUploadResult?>.Failure(
                 AppErrorsCataloge.Failure(
-                    ex.ErrorCode,
                     _localizer[ex.MessageKey]));
         }
         catch (Exception ex)
@@ -148,7 +141,6 @@ internal sealed class WriteUserService : IWriteUserService
 
             return Result<FileUploadResult?>.Failure(
                 AppErrorsCataloge.Failure(
-                    UserMessage.UserUpdateError,
                     _localizer[UserMessage.UserUpdateError]));
         }
     }
@@ -162,7 +154,7 @@ internal sealed class WriteUserService : IWriteUserService
 
             if (user is null)
                 return Result<string>.Failure(AppErrorsCataloge.NotFound(
-                    UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
+                    _localizer[UserMessage.UserNotFound]));
 
             UserBusinessRules.UserMustBeUniqueFullName(user, await _readRepo.AnyAsync(u => u.FullName == request.FullName && u.Id != userId, ct));
 
@@ -179,7 +171,7 @@ internal sealed class WriteUserService : IWriteUserService
                 // Invalidate cache
                 await _cache.RemoveAsync($"user:profile:{userId}", ct);
 
-                await _cache.RemoveByPrefixAsync("user:list:", ct);
+                //await _cache.RemoveByPrefixAsync("user:list:", ct);
 
                 return Result<string>.Success(_localizer[UserMessage.UserUpdateSuccess]);
             }
@@ -188,13 +180,13 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result<string>.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result<string>.Failure(AppErrorsCataloge.Validation(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating profile for {UserId}", userId);
             return Result<string>.Failure(AppErrorsCataloge.Failure(
-                UserMessage.UserUpdateError, _localizer[UserMessage.UserUpdateError]));
+                _localizer[UserMessage.UserUpdateError]));
         }
     }
 
@@ -207,16 +199,15 @@ internal sealed class WriteUserService : IWriteUserService
             var user = await _readRepo.GetByIdAsync(userId, ct);
             if (user is null)
                 return Result<string>.Failure(AppErrorsCataloge.NotFound(
-                    UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
+                    _localizer[UserMessage.UserNotFound]));
 
             if (!_hasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
                 return Result<string>.Failure(AppErrorsCataloge.Validation(
-                    _localizer[UserMessage.PasswordWrong], _localizer[UserMessage.PasswordWrong]));
+                    _localizer[UserMessage.PasswordWrong]));
 
             if (_hasher.VerifyPassword(request.NewPassword, user.PasswordHash))
                 return Result<string>.Failure(
                     AppErrorsCataloge.Validation(
-                        _localizer[DomainMessagies.PasswordUnchanged],
                         _localizer[DomainMessagies.PasswordUnchanged]));
 
             var newHash = _hasher.HashPassword(request.NewPassword);
@@ -232,13 +223,13 @@ internal sealed class WriteUserService : IWriteUserService
         catch (DomainException ex)
         {
             return Result<string>.Failure(AppErrorsCataloge
-                .Validation(_localizer[ex.ErrorCode], _localizer[ex.MessageKey]));
+                .Validation(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error changing password for {UserId}", userId);
             return Result<string>.Failure(AppErrorsCataloge.Failure(
-                UserMessage.PasswordUpdateFailed, _localizer[UserMessage.PasswordUpdateFailed]));
+                _localizer[UserMessage.PasswordUpdateFailed]));
         }
     }
 
@@ -251,7 +242,7 @@ internal sealed class WriteUserService : IWriteUserService
             var user = await _readRepo.GetByIdAsync(userId, ct);
             if (user is null)
                 return Result.Failure(AppErrorsCataloge.NotFound(
-                    UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
+                    _localizer[UserMessage.UserNotFound]));
 
             user.Suspend(request.Reason, request.SuspendedUntil);
 
@@ -274,12 +265,12 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error suspending user {UserId}", userId);
-            return Result.Failure(AppErrorsCataloge.Failure("User.SuspendFailed", "Failed to suspend user."));
+            return Result.Failure(AppErrorsCataloge.Failure("Failed to suspend user."));
         }
     }
 
@@ -291,8 +282,7 @@ internal sealed class WriteUserService : IWriteUserService
         {
             var user = await _readRepo.GetByIdAsync(userId, ct);
             if (user is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(
-                    UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
+                return Result.Failure(AppErrorsCataloge.NotFound(_localizer[UserMessage.UserNotFound]));
 
             user.Ban(request.Reason);
             await _writeRepo.UpdateAsync(user, ct);
@@ -313,12 +303,12 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error banning user {UserId}", userId);
-            return Result.Failure(AppErrorsCataloge.Failure("User.BanFailed", "Failed to ban user."));
+            return Result.Failure(AppErrorsCataloge.Failure("Failed to ban user."));
         }
     }
 
@@ -331,7 +321,7 @@ internal sealed class WriteUserService : IWriteUserService
             var user = await _readRepo.GetByIdAsync(userId, ct);
             if (user is null)
                 return Result.Failure(AppErrorsCataloge.NotFound(
-                    UserMessage.UserNotFound, _localizer[UserMessage.UserNotFound]));
+                    _localizer[UserMessage.UserNotFound]));
 
             user.Reactivate();
             await _writeRepo.UpdateAsync(user, ct);
@@ -352,12 +342,12 @@ internal sealed class WriteUserService : IWriteUserService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Validation(ex.ErrorCode, _localizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Validation(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error reactivating user {UserId}", userId);
-            return Result.Failure(AppErrorsCataloge.Failure("User.ReactivateFailed", "Failed to reactivate user."));
+            return Result.Failure(AppErrorsCataloge.Failure("Failed to reactivate user."));
         }
     }
 }

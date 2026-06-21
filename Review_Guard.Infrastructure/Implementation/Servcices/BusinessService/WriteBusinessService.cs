@@ -38,8 +38,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         {
             if (!_currentUser.UserId.HasValue)
                 return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
-                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized],
-                                      _stringLocalizer[CommonMessage.Unauthorized]));
+                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized]));
 
             var userId = _currentUser.UserId.Value;
 
@@ -47,21 +46,18 @@ internal sealed class WriteBusinessService : IWriteBusinessService
             var user = await _userService.GetProfileAsync(userId, ct);
             if (user is null)
                 return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
-                    NotFound(_stringLocalizer[AuthMessage.UserNotFound],
-                            _stringLocalizer[AuthMessage.UserNotFound]));
+                    NotFound(_stringLocalizer[AuthMessage.UserNotFound]));
 
             var nameExists = await _readBusinessRepository.NameExistsForOwnerAsync(userId, command.Name, ct);
             if (nameExists)
                 return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
-                    Conflict(_stringLocalizer[BusinessMessage.NameExistsForOwnerAsync],
-                             _stringLocalizer[BusinessMessage.NameExistsForOwnerAsync]));
+                    Conflict(_stringLocalizer[BusinessMessage.NameExistsForOwnerAsync]));
 
             // ── Validate category against BusinessCategory table (NOT Business!) ──
             var categoryExists = await _categoryRepository.AnyAsync(c => c.Id == command.BusinessCategoryId, ct);
             if (!categoryExists)
                 return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.
-                    NotFound(_stringLocalizer[BusinessMessage.BusinessCategoryNotFound],
-                            _stringLocalizer[BusinessMessage.BusinessCategoryNotFound]));
+                    NotFound(_stringLocalizer[BusinessMessage.BusinessCategoryNotFound]));
 
             // ── Create business ───────────────────────────────────────────────
             var business = Business.Create(
@@ -103,21 +99,15 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         }
         catch (DomainException ex)
         {
-            _logger.LogError(ex, "Domain error occurred while creating business. ErrorCode: {ErrorCode}, MessageKey: {MessageKey}", ex.ErrorCode, ex.MessageKey);
+            _logger.LogError(ex, "Domain error occurred while creating business. MessageKey: {MessageKey}", ex.MessageKey);
             return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.Failure
-                (
-                  ex.ErrorCode,
-                  _stringLocalizer[ex.MessageKey]
-                ));
+                (_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occurred while creating business.");
             return Result<CreateBusinessResponse>.Failure(AppErrorsCataloge.Failure
-                (
-                  ex.Message,
-                  _stringLocalizer[BusinessMessage.CreateBusinessFailed]
-                ));
+                (_stringLocalizer[BusinessMessage.CreateBusinessFailed]));
         }
     }
 
@@ -128,12 +118,12 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         {
             if (!_currentUser.UserId.HasValue)
                 return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.
-                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized], _stringLocalizer[CommonMessage.Unauthorized]));
+                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized]));
 
             var business = await _readBusinessRepository.FindFirstAsync(b => b.OwnerId == _currentUser.UserId.Value, ct);
             if (business is null)
                 return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.
-                    NotFound(BusinessMessage.BusinessNotFound, _stringLocalizer[BusinessMessage.BusinessNotFound]));
+                    NotFound(_stringLocalizer[BusinessMessage.BusinessNotFound]));
 
 
 
@@ -160,13 +150,12 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         catch (DomainException ex)
         {
             _logger.LogWarning(ex, "Domain error updating business {BusinessId}", command.Id);
-            return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.Forbidden(ex.ErrorCode, _stringLocalizer[ex.MessageKey]));
+            return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.Forbidden(_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error updating business {BusinessId}", command.Id);
-            return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.Failure(
-                ex.Message, _stringLocalizer[BusinessMessage.BusinessUpdateFailed]));
+            return Result<UpdateBusinessResponse>.Failure(AppErrorsCataloge.Failure(_stringLocalizer[BusinessMessage.BusinessUpdateFailed]));
         }
     }
 
@@ -177,17 +166,17 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         {
             if (!_currentUser.UserId.HasValue)
                 return Result<bool>.Failure(AppErrorsCataloge.
-                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized], _stringLocalizer[CommonMessage.Unauthorized]));
+                    Unauthorized(_stringLocalizer[CommonMessage.Unauthorized]));
 
             var business = await _readBusinessRepository.GetByIdAsync(businessId, ct);
             if (business is null)
                 return Result<bool>.Failure(AppErrorsCataloge.
-                    NotFound(BusinessMessage.BusinessNotFound, _stringLocalizer[BusinessMessage.BusinessNotFound]));
+                    NotFound(_stringLocalizer[BusinessMessage.BusinessNotFound]));
 
             var isAdmin = _currentUser.IsAdmin;
             if (!isAdmin && !business.IsOwnedBy(_currentUser.UserId.Value))
                 return Result<bool>.Failure(AppErrorsCataloge.
-                    Forbidden(CommonMessage.Forbidden, _stringLocalizer[CommonMessage.Forbidden]));
+                    Forbidden(_stringLocalizer[CommonMessage.Forbidden]));
 
             // Soft delete: deactivate rather than hard-delete to preserve reviews/branches history
             business.Deactivate();
@@ -212,8 +201,7 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error deleting business {BusinessId}", businessId);
-            return Result<bool>.Failure(AppErrorsCataloge.Failure(
-                ex.Message, _stringLocalizer[BusinessMessage.BusinessDeleteFailed]));
+            return Result<bool>.Failure(AppErrorsCataloge.Failure(_stringLocalizer[BusinessMessage.BusinessDeleteFailed]));
         }
     }
 
@@ -223,14 +211,17 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         try
         {
             if (!_currentUser.AdminId.HasValue)
-                return Result.Failure(AppErrorsCataloge.Unauthorized(CommonMessage.Unauthorized, _stringLocalizer[CommonMessage.Unauthorized]));
+                return Result.Failure(AppErrorsCataloge.Unauthorized(
+                    _stringLocalizer[CommonMessage.Unauthorized]));
 
             var business = await _readBusinessRepository.GetByIdAsync(businessId, ct);
             if (business is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(BusinessMessage.BusinessNotFound, _stringLocalizer[BusinessMessage.BusinessNotFound]));
+                return Result.Failure(AppErrorsCataloge.NotFound(
+                    _stringLocalizer[BusinessMessage.BusinessNotFound]));
 
             if (business.Status != BusinessStatus.PendingApproval)
-                return Result.Failure(AppErrorsCataloge.Conflict(BusinessMessage.BusinessAlreadyProcessed, _stringLocalizer[BusinessMessage.BusinessAlreadyProcessed]));
+                return Result.Failure(AppErrorsCataloge.Conflict(
+                    _stringLocalizer[BusinessMessage.BusinessAlreadyProcessed]));
 
             business.Approve(_currentUser.AdminId.Value, note);
 
@@ -254,12 +245,14 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _stringLocalizer[ex.MessageKey]));
+            _logger.LogError(ex, $"The Approved Business Failed Domain Exception. Domain Message: {ex.Message}");
+            return Result.Failure(AppErrorsCataloge.Failure(_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error approving business {BusinessId}", businessId);
-            return Result.Failure(AppErrorsCataloge.Failure(ex.Message, _stringLocalizer[BusinessMessage.BusinessApproveFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(
+                _stringLocalizer[BusinessMessage.BusinessApproveFailed]));
         }
     }
 
@@ -269,14 +262,17 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         try
         {
             if (!_currentUser.AdminId.HasValue)
-                return Result.Failure(AppErrorsCataloge.Unauthorized(CommonMessage.Unauthorized, _stringLocalizer[CommonMessage.Unauthorized]));
+                return Result.Failure(AppErrorsCataloge.Unauthorized(
+                    _stringLocalizer[CommonMessage.Unauthorized]));
 
             var business = await _readBusinessRepository.GetByIdAsync(businessId, ct);
             if (business is null)
-                return Result.Failure(AppErrorsCataloge.NotFound(BusinessMessage.BusinessNotFound, _stringLocalizer[BusinessMessage.BusinessNotFound]));
+                return Result.Failure(AppErrorsCataloge.NotFound(
+                    _stringLocalizer[BusinessMessage.BusinessNotFound]));
 
             if (business.Status != BusinessStatus.PendingApproval)
-                return Result.Failure(AppErrorsCataloge.Conflict(BusinessMessage.BusinessAlreadyProcessed, _stringLocalizer[BusinessMessage.BusinessAlreadyProcessed]));
+                return Result.Failure(AppErrorsCataloge.Conflict(
+                    _stringLocalizer[BusinessMessage.BusinessAlreadyProcessed]));
 
             business.Reject(_currentUser.AdminId.Value, reason);
 
@@ -300,12 +296,13 @@ internal sealed class WriteBusinessService : IWriteBusinessService
         }
         catch (DomainException ex)
         {
-            return Result.Failure(AppErrorsCataloge.Failure(ex.ErrorCode, _stringLocalizer[ex.MessageKey]));
+            return Result.Failure(AppErrorsCataloge.Failure(_stringLocalizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting business {BusinessId}", businessId);
-            return Result.Failure(AppErrorsCataloge.Failure(ex.Message, _stringLocalizer[BusinessMessage.BusinessRejectFailed]));
+            return Result.Failure(AppErrorsCataloge.Failure(
+                _stringLocalizer[BusinessMessage.BusinessRejectFailed]));
         }
     }
 }

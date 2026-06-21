@@ -39,7 +39,6 @@ internal sealed class ReadUserService : IReadUserService
             if (_currentUser.UserId != userId)
                 return Result<UserProfileResponse>.Failure(
                     AppErrorsCataloge.Forbidden(
-                        _localizer[AuthMessage.InvalidCredentials],
                         _localizer[AuthMessage.InvalidCredentials]));
 
             var user = await _readUserRepo.ProjectFirstOrDefaultAsync(
@@ -49,7 +48,6 @@ internal sealed class ReadUserService : IReadUserService
             if (user is null)
                 return Result<UserProfileResponse>.Failure(
                     AppErrorsCataloge.NotFound(
-                        UserMessage.UserNotFound,
                         _localizer[UserMessage.UserNotFound]));
 
             var stats = await _readUserRepo.GetUserReviewStatsAsync(userId, ct);
@@ -70,13 +68,13 @@ internal sealed class ReadUserService : IReadUserService
         {
             _logger.LogWarning(ex, "Domain error fetching profile {UserId}", userId);
             return Result<UserProfileResponse>.Failure(
-                AppErrorsCataloge.Failure(ex.ErrorCode, _localizer[ex.MessageKey]));
+                AppErrorsCataloge.Failure(_localizer[ex.MessageKey]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error fetching profile {UserId}", userId);
             return Result<UserProfileResponse>.Failure(
-                AppErrorsCataloge.Failure("UnexpectedError", _localizer["UnexpectedError"]));
+                AppErrorsCataloge.Failure(_localizer["UnexpectedError"]));
         }
     }
 
@@ -107,7 +105,7 @@ internal sealed class ReadUserService : IReadUserService
         {
             _logger.LogError(ex, "Error fetching all users");
             return Result<PagedResult<UserListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(UserMessage.GetAllUsersFailed, _localizer[UserMessage.GetAllUsersFailed]));
+                AppErrorsCataloge.Failure(_localizer[UserMessage.GetAllUsersFailed]));
         }
     }
 
@@ -130,7 +128,7 @@ internal sealed class ReadUserService : IReadUserService
         {
             _logger.LogError(ex, "Error fetching activities for {UserId}", userId);
             return Result<PagedResult<UserActivityDto>>.Failure(
-                AppErrorsCataloge.Failure(UserMessage.GetUserActivitiesFailed, _localizer[UserMessage.GetUserActivitiesFailed]));
+                AppErrorsCataloge.Failure(_localizer[UserMessage.GetUserActivitiesFailed]));
         }
     }
 }

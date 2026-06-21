@@ -35,7 +35,7 @@ public class Result<T> : Result
         IsSuccess
             ? _value!
             : throw new InvalidOperationException(
-                $"Cannot access Value when failure. ErrorCode: {Error?.Code}");
+                $"Cannot access Value when failure. ErrorMessage: {Error?.Message}");
 
     public static Result<T> Success(T value)
         => new(value, true, null);

@@ -67,8 +67,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
             _logger.LogError(ex, "Error getting businesses");
             return Result<PagedResult<BusinessListtDto>>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BusinessWithReviewsAndBranchsFetchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BusinessWithReviewsAndBranchsFetchError]));
         }
     }
 
@@ -94,8 +93,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
             if (businesses is null)
                 return Result<BusinessListWithBranchsDto>.Failure(
                     AppErrorsCataloge.Failure(
-                        _localizer[BusinessMessage.BusinessNotFound],
-                        _localizer[BusinessMessage.BusinessFetchError]));
+                        _localizer[BusinessMessage.BusinessNotFound]));
 
             var businessIds = new List<Guid> { businesses.Id };
 
@@ -120,8 +118,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
 
             return Result<BusinessListWithBranchsDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BusinessWithBranchsFetchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BusinessWithBranchsFetchError]));
         }
     }
 
@@ -183,8 +180,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
 
             return Result<PagedResult<BusinessListWithBranchsDto>>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BusinessWithBranchsFetchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BusinessWithBranchsFetchError]));
         }
     }
 
@@ -240,8 +236,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
 
             return Result<PagedResult<BusinessWithReviewDto>>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BusinessWithReviewsFetchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BusinessWithReviewsFetchError]));
         }
     }
 
@@ -269,8 +264,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
             {
                 return Result<BranchWithReviewsDto>.Failure(
                     AppErrorsCataloge.NotFound(
-                        _localizer[BusinessMessage.BrancheNotFound, branchId],
-                        _localizer[BusinessMessage.BusinessFetchError]));
+                        _localizer[BusinessMessage.BrancheNotFound, branchId]));
             }
 
             await _cache.SetAsync(
@@ -287,8 +281,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
 
             return Result<BranchWithReviewsDto>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BranchReviewFetchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BranchReviewFetchError]));
         }
     }
 
@@ -314,8 +307,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
             {
                 return Result<PagedResult<BusinessListWithBranchsDto>>.Failure(
                     AppErrorsCataloge.Failure(
-                        _localizer[BusinessMessage.BusinessNotFound],
-                        _localizer[BusinessMessage.BusinessSearchError]));
+                        _localizer[BusinessMessage.BusinessNotFound]));
             }
 
             var businessIds = branches.Select(x => x.Id).ToList();
@@ -350,8 +342,7 @@ internal sealed class ReadBusinessService : IReadBusinessService
 
             return Result<PagedResult<BusinessListWithBranchsDto>>.Failure(
                 AppErrorsCataloge.Failure(
-                    _localizer[BusinessMessage.BusinessSearchError],
-                    _localizer[BusinessMessage.BusinessFetchError]));
+                    _localizer[BusinessMessage.BusinessSearchError]));
         }
     }
 }

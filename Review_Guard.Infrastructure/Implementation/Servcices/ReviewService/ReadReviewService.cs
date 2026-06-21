@@ -37,7 +37,7 @@ internal sealed class ReadReviewService : IReadReviewService
             var dto = await _repo.ProjectFirstOrDefaultAsync(new ReviewByIdSpecification(reviewId), ReviewProjections.Full, ct);
             if (dto is null)
                 return Result<ReviewResponseDto>.Failure(
-                    AppErrorsCataloge.NotFound(ReviewMessage.NotFound, _localizer[ReviewMessage.NotFound]));
+                    AppErrorsCataloge.NotFound(_localizer[ReviewMessage.NotFound]));
 
             await _cache.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(10), ct);
             return Result<ReviewResponseDto>.Success(dto);
@@ -46,7 +46,7 @@ internal sealed class ReadReviewService : IReadReviewService
         {
             _logger.LogError(ex, "Error fetching review {ReviewId}", reviewId);
             return Result<ReviewResponseDto>.Failure(
-                AppErrorsCataloge.Failure(ReviewMessage.FetchFailed, _localizer[ReviewMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReviewMessage.FetchFailed]));
         }
     }
 
@@ -65,7 +65,7 @@ internal sealed class ReadReviewService : IReadReviewService
         {
             _logger.LogError(ex, "Error fetching reviews for user {UserId}", userId);
             return Result<PagedResult<ReviewListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ReviewMessage.FetchFailed, _localizer[ReviewMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReviewMessage.FetchFailed]));
         }
     }
 
@@ -84,7 +84,7 @@ internal sealed class ReadReviewService : IReadReviewService
         {
             _logger.LogError(ex, "Error fetching pending reviews");
             return Result<PagedResult<ReviewListItemDto>>.Failure(
-                AppErrorsCataloge.Failure(ReviewMessage.FetchFailed, _localizer[ReviewMessage.FetchFailed]));
+                AppErrorsCataloge.Failure(_localizer[ReviewMessage.FetchFailed]));
         }
     }
 }

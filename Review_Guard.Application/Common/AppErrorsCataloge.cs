@@ -5,21 +5,21 @@ namespace Review_Guard.Application.Common;
 
 public static class AppErrorsCataloge
 {
-    public static AppError NotFound(string code, string message)
-        => new(code, message, ErrorType.NotFound);
+    public static AppError NotFound(string message)
+        => new(message, ErrorType.NotFound);
 
-    public static AppError Unauthorized(string code, string message)
-        => new(code, message, ErrorType.Unauthorized);
+    public static AppError Unauthorized(string message)
+        => new(message, ErrorType.Unauthorized);
 
-    public static AppError Validation(string code, string message)
-        => new(code, message, ErrorType.Validation);
+    public static AppError Validation(string message)
+        => new(message, ErrorType.Validation);
 
-    public static AppError Conflict(string code, string message)
-        => new(code, message, ErrorType.Conflict);
+    public static AppError Conflict(string message)
+        => new(message, ErrorType.Conflict);
 
-    public static AppError Failure(string code, string message)
-        => new(code, message, ErrorType.Failure);
+    public static AppError Failure(string message)
+        => new(message, ErrorType.Failure);
 
-    public static AppError Forbidden(string code, string message)
-        => new(code, message, ErrorType.Forbidden);
+    public static AppError Forbidden(string message)
+        => new(message, ErrorType.Forbidden);
 }

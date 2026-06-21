@@ -11,16 +11,12 @@ public sealed class EmailAddress : ValueObject
     public static EmailAddress Create(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException(
-                "Email cannot be empty.",
-                DomainMessagies.EmailRequired);
+            throw new DomainException(DomainMessagies.EmailRequired);
 
         email = email.Trim().ToLowerInvariant();
 
         if (!IsValidEmail(email))
-            throw new DomainException(
-                $"'{email}' is not a valid email address.",
-                DomainMessagies.InvalidEmail);
+            throw new DomainException(DomainMessagies.InvalidEmail);
 
         return new EmailAddress(email);
     }

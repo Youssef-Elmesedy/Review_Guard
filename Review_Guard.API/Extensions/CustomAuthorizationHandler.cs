@@ -27,7 +27,7 @@ public class CustomAuthorizationResultHandler : IAuthorizationMiddlewareResultHa
             context.Response.ContentType = "application/json";
 
             var response = Result.Failure(
-                AppErrorsCataloge.Unauthorized("403", _localizer[CommonMessage.Forbidden])
+                AppErrorsCataloge.Unauthorized(_localizer[CommonMessage.Forbidden])
             );
 
             await context.Response.WriteAsJsonAsync(response);
@@ -40,7 +40,7 @@ public class CustomAuthorizationResultHandler : IAuthorizationMiddlewareResultHa
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
             var response = Result.Failure(
-                AppErrorsCataloge.Unauthorized("401", _localizer[CommonMessage.Unauthorized])
+                AppErrorsCataloge.Unauthorized(_localizer[CommonMessage.Unauthorized])
             );
 
             await context.Response.WriteAsJsonAsync(response);

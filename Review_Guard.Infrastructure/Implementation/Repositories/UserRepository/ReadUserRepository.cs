@@ -30,8 +30,7 @@ internal sealed class ReadUserRepository : GenericReadRepository<User>, IReadUse
             var userExists = await _appDbContext.Users.AnyAsync(u => u.Id == userId, cancellationToken);
 
             if (!userExists)
-                throw new DomainException(_localizer[DomainMessagies.NotFound],
-                    _localizer[DomainMessagies.NotFound]);
+                throw new DomainException(_localizer[DomainMessagies.NotFound]);
 
             return await _appDbContext.Reviews
                     .Where(r => r.UserId == userId)

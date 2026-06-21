@@ -9,14 +9,10 @@ public static class ReviewBusinessRules
     public static void UserCannotReviewOwnBusiness(User user, Branch branch)
     {
         if (branch.Business.IsOwnedBy(user.Id))
-            throw new DomainException(
-                "You cannot review your own business.",
-                DomainMessagies.UserCannotReviewOwnBusiness);
+            throw new DomainException(DomainMessagies.UserCannotReviewOwnBusiness);
 
         if (branch.IsManagedBy(user.Id))
-            throw new DomainException(
-                "You cannot review a business you manage.",
-                DomainMessagies.UserCannotReviewManagedBusiness);
+            throw new DomainException(DomainMessagies.UserCannotReviewManagedBusiness);
     }
 
     public static void UserMustBeEligibleToReview(User user, int maxPerDay = 5)
@@ -27,25 +23,19 @@ public static class ReviewBusinessRules
     public static void UserHasNotAlreadyReviewedBusiness(bool hasExisting)
     {
         if (hasExisting)
-            throw new DomainException(
-                "You have already submitted a review for this business.",
-                DomainMessagies.AlreadyReviewed);
+            throw new DomainException(DomainMessagies.AlreadyReviewed);
     }
 
     public static void ProofMustBelongToUser(Proof proof, Guid userId)
     {
         if (proof.UserId != userId)
-            throw new DomainException(
-                "The provided proof does not belong to you.",
-                DomainMessagies.Unauthorized);
+            throw new DomainException(DomainMessagies.Unauthorized);
     }
 
     public static void ProofMustMatchBusiness(Proof proof, Guid branchid)
     {
         if (proof.BranchId != branchid)
-            throw new DomainException(
-                "The provided proof does not match this business.",
-                DomainMessagies.ProofBusinessMismatch);
+            throw new DomainException(DomainMessagies.ProofBusinessMismatch);
     }
 
     public static void ProofMustBeVerified(Proof proof)
@@ -62,9 +52,7 @@ public static class ReviewBusinessRules
             return;
 
         if (proof is null)
-            throw new DomainException(
-                $"Users at {user.Level} level must supply proof of purchase.",
-                DomainMessagies.ProofRequired);
+            throw new DomainException(DomainMessagies.ProofRequired);
 
         ProofMustBeVerified(proof);
     }
@@ -84,8 +72,6 @@ public static class ReviewBusinessRules
     public static void ValidateRating(int rating)
     {
         if (rating < 1 || rating > 5)
-            throw new DomainException(
-                "Rating must be between 1 and 5.",
-                DomainMessagies.InvalidRatingValue);
+            throw new DomainException(DomainMessagies.InvalidRatingValue);
     }
 }
