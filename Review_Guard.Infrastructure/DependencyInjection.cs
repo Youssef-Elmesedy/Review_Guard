@@ -1,22 +1,14 @@
-using Review_Guard.Application.Abstractions.Repositories.BusinessCategoryRepository;
-using Review_Guard.Infrastructure.Implementation.Repositories.BusinessCategoryRepository;
-using Review_Guard.Application.Feature.ReviewModul.Services;
-using Review_Guard.Application.Feature.ProofModul.Services;
-using Review_Guard.Application.Feature.ReportModul.Services;
-using Review_Guard.Infrastructure.Implementation.Servcices.ReviewService;
-using Review_Guard.Infrastructure.Implementation.Servcices.ProofService;
-using Review_Guard.Infrastructure.Implementation.Servcices.ReportService;
-using Review_Guard.Infrastructure.Implementation.Servcices.NotificationService;
-using Review_Guard.Infrastructure.Implementation.Repositories.NotificationRepository;
-using Review_Guard.Application.Abstractions.Services.NotificationService;
-using Review_Guard.Application.Abstractions.Repositories.NotificationRepository;
 using Review_Guard.Application.Abstractions.Repositories.MediaRepository;
 using Review_Guard.Application.Abstractions.Services.MediaService;
-using Review_Guard.Application.Feature.BusinessModul.Services;
-using Review_Guard.Application.Feature.UserModul.UserService;
+using Review_Guard.Application.Feature.ProofModul.Services;
+using Review_Guard.Application.Feature.ReportModul.Services;
+using Review_Guard.Application.Feature.ReviewModul.Services;
 using Review_Guard.Infrastructure.Implementation.Repositories.MediaRepository;
 using Review_Guard.Infrastructure.Implementation.Servcices.BusinessService;
 using Review_Guard.Infrastructure.Implementation.Servcices.MediaService;
+using Review_Guard.Infrastructure.Implementation.Servcices.ProofService;
+using Review_Guard.Infrastructure.Implementation.Servcices.ReportService;
+using Review_Guard.Infrastructure.Implementation.Servcices.ReviewService;
 using Review_Guard.Infrastructure.Implementation.Servcices.UserService;
 
 namespace Review_Guard.Infrastructure;
@@ -44,7 +36,7 @@ public static class DependencyInjection
         services.AddMemoryCache();
 
         // Distributed Cache (Redis أو In-Memory مؤقت)
-        services.AddDistributedMemoryCache(); // 👈 مؤقت (بدل Redis)
+        services.AddDistributedMemoryCache();
 
         // Hybrid Cache Service
         services.AddSingleton<ICacheService, MemoryCacheService>();
@@ -61,8 +53,8 @@ public static class DependencyInjection
         services.AddScoped<IReadBranchRepository, ReadBranchRepository>();
         services.AddScoped<IWriteBranchRepository, WriteBranchRepository>();
 
-services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryRepository>();
-                services.AddScoped<IReadBusinessRepository, ReadBusinessRepository>();
+        services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryRepository>();
+        services.AddScoped<IReadBusinessRepository, ReadBusinessRepository>();
         services.AddScoped<IWriteBusinessRepository, WriteBusinessRepository>();
 
         services.AddScoped<IReadProofRepository, ReadProofRepository>();
@@ -87,9 +79,9 @@ services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryReposito
         services.AddScoped<IWriteMediaRepository, WriteMediaRepository>();
 
         // ── Notification ──────────────────────────────────────────────────────
-        services.AddScoped<IReadNotificationRepository,  ReadNotificationRepository>();
+        services.AddScoped<IReadNotificationRepository, ReadNotificationRepository>();
         services.AddScoped<IWriteNotificationRepository, WriteNotificationRepository>();
-        services.AddScoped<INotificationService,         NotificationService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         //// ── Dashboard Repositories (read-model / CQRS read side) ───────────────
         services.AddScoped<IAuthService, AuthService>();
@@ -104,15 +96,15 @@ services.AddScoped<IReadBusinessCategoryRepository, ReadBusinessCategoryReposito
         services.AddScoped<IWriteUserService, WriteUserService>();
 
         // ── Review ────────────────────────────────────────────────────────────
-        services.AddScoped<IReadReviewService,  ReadReviewService>();
+        services.AddScoped<IReadReviewService, ReadReviewService>();
         services.AddScoped<IWriteReviewService, WriteReviewService>();
 
         // ── Proof ─────────────────────────────────────────────────────────────
-        services.AddScoped<IReadProofService,  ReadProofService>();
+        services.AddScoped<IReadProofService, ReadProofService>();
         services.AddScoped<IWriteProofService, WriteProofService>();
 
         // ── Report ────────────────────────────────────────────────────────────
-        services.AddScoped<IReadReportService,  ReadReportService>();
+        services.AddScoped<IReadReportService, ReadReportService>();
         services.AddScoped<IWriteReportService, WriteReportService>();
 
         //services.AddScoped<IUserDashboardRepository, UserDashboardRepository>();
