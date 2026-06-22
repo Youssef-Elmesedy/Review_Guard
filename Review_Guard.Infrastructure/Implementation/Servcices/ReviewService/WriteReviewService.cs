@@ -195,8 +195,6 @@ internal sealed class WriteReviewService : IWriteReviewService
 
                 await _writeRepo.UpdateAsync(review, ct);
 
-                await _unitofwork.CommitTransactionAsync(ct); // error
-
                 branch.DecrementPendingReviews();
 
                 var approvedReviews = await _readRepo.GetApprovedRatingsAsync(branch.Id, ct);

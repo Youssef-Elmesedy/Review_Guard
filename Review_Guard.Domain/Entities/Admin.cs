@@ -17,6 +17,9 @@ public class Admin : BaseEntity
     public int TotalActionsPerformed { get; private set; }
     public DateTime? LastLoginAt { get; private set; }
 
+    //Navigation
+    private readonly List<UserActivity> _activities = new();
+    public IReadOnlyCollection<UserActivity> Activities => _activities.AsReadOnly();
 
     public static Admin Create(string fullName, string email,
         string passwordHash, Roles role)
@@ -33,9 +36,28 @@ public class Admin : BaseEntity
         };
     }
 
-    //Navigation
-    private readonly List<UserActivity> _activities = new();
-    public IReadOnlyCollection<UserActivity> Activities => _activities.AsReadOnly();
+    /// <summary>Updates editable profile fields for the admin themselves.</summary>
+    public void UpdateProfile(string? fullName)
+    {
+        if (!string.IsNullOrWhiteSpace(fullName))
+        {
+            FullName = fullName.Trim();
+            NormalizedFullName = fullName.Trim().ToUpperInvariant();
+        }
+        SetUpdatedAt();
+    }
+    /// <summary>Changes the admin's password. The new password must be provided as a hash.</summary>
+    public void ChangePassword(string newPasswordHash)
+    {
+
+        if (string.IsNullOrWhiteSpace(newPasswordHash))
+            throw new DomainException(
+                DomainMessagies.PasswordRequired);
+
+        PasswordHash = newPasswordHash;
+
+        SetUpdatedAt();
+    }
 
     public void RecordAction() { TotalActionsPerformed++; }
     public void RecordLogin() { LastLoginAt = DateTime.UtcNow; }

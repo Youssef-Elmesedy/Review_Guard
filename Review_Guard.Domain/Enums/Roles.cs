@@ -195,7 +195,8 @@ public enum NotificationType
     NewBusinessPending = 41,
     NewReviewPending = 42,
     NewReportPending = 43,
-    NewProofPending = 44
+    NewProofPending = 44,
+    SystemAnnouncement = 50
 }
 
 public enum NotificationTarget

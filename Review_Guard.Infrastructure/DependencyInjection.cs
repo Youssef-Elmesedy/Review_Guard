@@ -1,9 +1,11 @@
 using Review_Guard.Application.Abstractions.Repositories.MediaRepository;
 using Review_Guard.Application.Abstractions.Services.MediaService;
+using Review_Guard.Application.Feature.AdminModule.Services;
 using Review_Guard.Application.Feature.ProofModul.Services;
 using Review_Guard.Application.Feature.ReportModul.Services;
 using Review_Guard.Application.Feature.ReviewModul.Services;
 using Review_Guard.Infrastructure.Implementation.Repositories.MediaRepository;
+using Review_Guard.Infrastructure.Implementation.Servcices.AdminService;
 using Review_Guard.Infrastructure.Implementation.Servcices.BusinessService;
 using Review_Guard.Infrastructure.Implementation.Servcices.MediaService;
 using Review_Guard.Infrastructure.Implementation.Servcices.ProofService;
@@ -86,6 +88,8 @@ public static class DependencyInjection
         //// ── Dashboard Repositories (read-model / CQRS read side) ───────────────
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+
+        services.AddScoped<IAdminService, AdminService>();
 
         services.AddScoped<IReadBusinessService, ReadBusinessService>();
         services.AddScoped<IWriteBusinessService, WriteBusinessService>();

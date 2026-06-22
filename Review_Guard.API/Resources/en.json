@@ -1,4 +1,17 @@
 {
+  "Admin": {
+    "NotFound": "Admin not found",
+    "ProfileUpdated": "Admin profile updated successfully.",
+    "UpdateFailed": "Failed to update admin profile. Please try again later.",
+    "DashboardFetchFailed": "Failed to fetch admin dashboard data. Please try again later.",
+    "BroadcastSent": "Broadcast message sent successfully.",
+    "BroadcastFailed": "Failed to send broadcast message. Please try again later.",
+    "Unauthorized": "You are not authorized to perform this action.",
+    "ChangePasswordFailed": "Failed to change password. Please try again later.",
+    "InvalidPassword": "The current password is incorrect.",
+    "PasswordsDoNotMatch": "The new password and confirm password do not match.",
+    "NewPasswordSameAsOld": "The new password is the same as the current password."
+  },
   "Auth": {
     "UserAlreadyExists": "A user with this email address already exists.",
     "FullNameAlreadyTaken": "A user with this full name already exists.",

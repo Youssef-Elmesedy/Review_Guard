@@ -36,6 +36,11 @@ public class Program
                 System.Text.Json.JsonCommentHandling.Skip;
         });
 
+        // Suppress MediatR license logging
+        builder.Logging.AddFilter(
+    "LuckyPennySoftware.MediatR.License",
+    LogLevel.None);
+
         // Localization
         builder.Services.AddLocalizationServices();
 
