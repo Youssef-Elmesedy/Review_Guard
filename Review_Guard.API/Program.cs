@@ -55,7 +55,7 @@ public class Program
 
         // Cross-cutting
         builder.Services.AddJwtAuthentication(builder.Configuration);
-        builder.Services.AddAuthorization(); // 
+        builder.Services.AddAuthorization();
         builder.Services.AddSwaggerWithAuth();
         builder.Services.AddCustomAuthorizationHandler();
 
@@ -105,6 +105,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        #region Log raw request body for debugging purposes
         // Log raw request body for debugging purposes
         //app.Use(async (ctx, next) =>
         //{
@@ -117,6 +118,7 @@ public class Program
 
         //    await next();
         //});
+        #endregion
 
         // Use localization
         var localizationOptions =
